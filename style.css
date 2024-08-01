@@ -22,7 +22,6 @@ nav h1 span {
   height: 100vh;
 }
 .projects {
-  /* border: 1px solid aquamarine; */
   padding: 20px;
   height: 70%;
   margin: 10px;
@@ -36,7 +35,6 @@ nav {
   font-size: 2em;
 }
 .projectsHolder {
-  /* border: 1px solid red; */
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
