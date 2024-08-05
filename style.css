@@ -2,6 +2,7 @@
 * {
   font-family: "Teko", sans-serif;
   margin: 0;
+  transition: all 0.3s ease-in-out;
 }
 body {
   margin: 0;
@@ -60,4 +61,24 @@ nav {
 }
 .projectDescription {
   color: white;
+}
+.project:hover {
+  background-color: #404040;
+}
+.projectTitle:hover {
+  color: aquamarine;
+}
+@media screen and (max-width: 992px) {
+  /* if needed later */
+}
+@media screen and (max-width: 600px) {
+  .projectsHolder {
+    margin: 0;
+    padding: 0;
+    width: fit-content;
+  }
+  .project img {
+    width: 260px;
+    height: max-content;
+  }
 }
