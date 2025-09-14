@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <section className="hero fade-in">
       <h1>
-        Hi, I&apos;m <span className="highlight">Rushaid Khan</span>
+        Hi, I&apos;m <span className="marker">Rushaid Khan</span>
       </h1>
 
       <p>

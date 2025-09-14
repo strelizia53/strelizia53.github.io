@@ -4,10 +4,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -24,7 +21,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* Navbar */}
         <header className="header">
           <div className="container nav">
             <Link href="/" className="brand" aria-label="Go to home">
@@ -60,16 +56,14 @@ export default function RootLayout({
           </div>
         </header>
 
-        {/* Main */}
         <main className="container" style={{ paddingBlock: "32px" }}>
           {children}
         </main>
 
-        {/* Footer */}
         <footer className="footer">
           <div className="container">
             <p style={{ margin: 0 }}>
-              © {new Date().getFullYear()} Rushaid Khan — Built with Next.js.
+              © {new Date().getFullYear()} My Name — Built with Next.js.
             </p>
             <div className="footer-links">
               <a
