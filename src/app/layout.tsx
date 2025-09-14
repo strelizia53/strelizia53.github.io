@@ -69,7 +69,7 @@ export default function RootLayout({
         <footer className="footer">
           <div className="container">
             <p style={{ margin: 0 }}>
-              © {new Date().getFullYear()} My Name — Built with Next.js.
+              © {new Date().getFullYear()} Rushaid Khan — Built with Next.js.
             </p>
             <div className="footer-links">
               <a

@@ -1,8 +1,10 @@
-/* -------- Color System -------- */
+/* -------- Color System (accessible) -------- */
 :root {
   --bg: #f6f6f6;
   --fg: #000000;
-  --accent: #cfffe2;
+  --accent: #cfffe2; /* use for fills/chips/underlines */
+  --accent-ink: #1a855c; /* darker green for text on light bg (AA) */
+  --accent-contrast: #000000; /* text color on accent backgrounds */
   --muted: #a2d5c6;
 
   --radius: 14px;
@@ -13,9 +15,10 @@
 .dark {
   --bg: #000000;
   --fg: #f6f6f6;
-  /* keep accents consistent across themes */
   --accent: #cfffe2;
-  --muted: #a2d5c6;
+  /* in dark mode, mint text is readable on black */
+  --accent-ink: #cfffe2;
+  --accent-contrast: #000000;
 
   --shadow-soft: 0 8px 24px rgba(255, 255, 255, 0.06);
   --shadow-card: 0 4px 16px rgba(255, 255, 255, 0.08);
@@ -108,12 +111,12 @@ button:focus-visible {
   transition: transform 220ms ease;
   border-radius: 1px;
 }
+.nav-link:hover {
+  color: var(--accent-ink);
+}
 .nav-link:hover::after,
 .nav-link[aria-current="page"]::after {
   transform: scaleX(1);
-}
-.nav-link:hover {
-  color: var(--fg);
 }
 
 /* -------- Buttons -------- */
@@ -137,7 +140,7 @@ button:focus-visible {
 
 .btn-primary {
   background: var(--accent);
-  color: var(--fg);
+  color: var(--accent-contrast); /* <-- black text on mint for contrast */
   border-color: color-mix(in srgb, var(--fg) 15%, transparent);
 }
 .btn-primary:hover {
@@ -171,14 +174,32 @@ button:focus-visible {
 .hero p {
   margin: 0 auto;
   max-width: 42ch;
-  opacity: 0.85;
+  opacity: 0.88;
   font-size: clamp(1rem, 1.2vw, 1.125rem);
 }
-.highlight {
-  color: var(--accent);
+
+/* Accessible name highlight:
+   - Light mode: black text with a mint marker behind
+   - Dark mode: mint text (high contrast on black) */
+.marker {
+  color: var(--fg);
+  background: linear-gradient(
+    180deg,
+    transparent 60%,
+    color-mix(in srgb, var(--accent) 88%, transparent) 0
+  );
+  border-radius: 6px;
+  padding: 0 0.25rem;
+}
+.dark .marker {
+  background: none;
+  color: var(--accent-ink); /* mint on dark */
 }
 
-/* -------- Footer -------- */
+/* If you *do* want colored text (not marker), use this instead:
+.highlight { color: var(--accent-ink); }
+*/
+
 .footer {
   border-top: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
   padding: 28px 0;
@@ -204,7 +225,6 @@ button:focus-visible {
 .fade-in {
   animation: fadeIn 0.6s ease-out both;
 }
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -216,7 +236,6 @@ button:focus-visible {
   }
 }
 
-/* -------- Small screens -------- */
 @media (max-width: 720px) {
   .nav {
     gap: 10px;
