@@ -8,7 +8,6 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -21,72 +20,73 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {/* Navbar */}
-        <header className="sticky top-0 z-50 bg-background dark:bg-background-dark border-b border-muted">
-          <nav className="max-w-5xl mx-auto flex justify-between items-center py-4 px-6">
-            <Link href="/" className="text-xl font-bold">
+        <header className="header">
+          <div className="container nav">
+            <Link href="/" className="brand" aria-label="Go to home">
               MyPortfolio
             </Link>
-            <div className="flex items-center space-x-6">
-              <ul className="flex space-x-6">
+
+            <nav aria-label="Primary">
+              <ul className="nav-list">
                 <li>
-                  <Link href="/" className="hover:text-accent transition-colors">
+                  <Link href="/" className="nav-link">
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-accent transition-colors">
+                  <Link href="/projects" className="nav-link">
                     Projects
                   </Link>
                 </li>
                 <li>
-                  <Link href="/blog" className="hover:text-accent transition-colors">
+                  <Link href="/blog" className="nav-link">
                     Blog
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-accent transition-colors">
+                  <Link href="/contact" className="nav-link">
                     Contact
                   </Link>
                 </li>
               </ul>
-              <ThemeToggle />
-            </div>
-          </nav>
+            </nav>
+
+            <ThemeToggle />
+          </div>
         </header>
 
-        {/* Main Content */}
-        <main className="max-w-5xl mx-auto px-6 py-8">{children}</main>
+        {/* Main */}
+        <main className="container" style={{ paddingBlock: "32px" }}>
+          {children}
+        </main>
 
         {/* Footer */}
-        <footer className="bg-background dark:bg-background-dark border-t border-muted text-center py-6 mt-12">
-          <p className="text-sm text-foreground dark:text-foreground-dark">
-            © {new Date().getFullYear()} My Name. Built with Next.js.
-          </p>
-          <div className="mt-2 flex justify-center space-x-4">
-            <a
-              href="https://github.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://linkedin.com/in/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent transition-colors"
-            >
-              LinkedIn
-            </a>
+        <footer className="footer">
+          <div className="container">
+            <p style={{ margin: 0 }}>
+              © {new Date().getFullYear()} My Name — Built with Next.js.
+            </p>
+            <div className="footer-links">
+              <a
+                href="https://github.com/yourusername"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://linkedin.com/in/yourusername"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                LinkedIn
+              </a>
+            </div>
           </div>
         </footer>
       </body>
