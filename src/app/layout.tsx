@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,44 +26,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F6F6F6] text-[#000000]`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* Navbar */}
-        <header className="bg-[#F6F6F6] shadow-md">
+        <header className="bg-background-light dark:bg-background-dark shadow-md">
           <nav className="max-w-5xl mx-auto flex justify-between items-center py-4 px-6">
             <h1 className="text-xl font-bold">MyPortfolio</h1>
-            <ul className="flex space-x-6">
-              <li>
-                <a href="/" className="hover:text-[#CFFFE2] transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/projects"
-                  className="hover:text-[#CFFFE2] transition-colors"
-                >
-                  Projects
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/blog"
-                  className="hover:text-[#CFFFE2] transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/contact"
-                  className="hover:text-[#CFFFE2] transition-colors"
-                >
-                  Contact
-                </a>
-              </li>
-            </ul>
+            <div className="flex items-center space-x-6">
+              <ul className="flex space-x-6">
+                <li>
+                  <Link href="/" className="hover:text-accent transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/projects" className="hover:text-accent transition-colors">
+                    Projects
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog" className="hover:text-accent transition-colors">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-accent transition-colors">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+              <ThemeToggle />
+            </div>
           </nav>
         </header>
 
@@ -69,7 +63,7 @@ export default function RootLayout({
         <main className="max-w-5xl mx-auto px-6 py-8">{children}</main>
 
         {/* Footer */}
-        <footer className="bg-[#A2D5C6] text-center py-6 mt-12">
+        <footer className="bg-muted text-center py-6 mt-12 text-foreground-light dark:text-foreground-dark">
           <p className="text-sm">
             © {new Date().getFullYear()} My Name. Built with Next.js.
           </p>
@@ -78,7 +72,7 @@ export default function RootLayout({
               href="https://github.com/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#CFFFE2] transition-colors"
+              className="hover:text-accent transition-colors"
             >
               GitHub
             </a>
@@ -86,7 +80,7 @@ export default function RootLayout({
               href="https://linkedin.com/in/yourusername"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#CFFFE2] transition-colors"
+              className="hover:text-accent transition-colors"
             >
               LinkedIn
             </a>
