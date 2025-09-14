@@ -2,7 +2,7 @@
 
 @layer base {
   body {
-    @apply bg-background-light text-foreground-light dark:bg-background-dark dark:text-foreground-dark;
+    @apply bg-background text-foreground dark:bg-background-dark dark:text-foreground-dark;
     font-family: Arial, Helvetica, sans-serif;
   }
 }

@@ -7,15 +7,24 @@ const config: Config = {
     extend: {
       colors: {
         background: {
-          light: "#F6F6F6",
+          DEFAULT: "#F6F6F6",
           dark: "#000000",
         },
         foreground: {
-          light: "#000000",
+          DEFAULT: "#000000",
           dark: "#F6F6F6",
         },
         accent: "#CFFFE2",
         muted: "#A2D5C6",
+      },
+      keyframes: {
+        fadeIn: {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn 0.6s ease-out forwards",
       },
     },
   },

@@ -26,11 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {/* Navbar */}
-        <header className="bg-background-light dark:bg-background-dark shadow-md">
+        <header className="sticky top-0 z-50 bg-background dark:bg-background-dark border-b border-muted">
           <nav className="max-w-5xl mx-auto flex justify-between items-center py-4 px-6">
-            <h1 className="text-xl font-bold">MyPortfolio</h1>
+            <Link href="/" className="text-xl font-bold">
+              MyPortfolio
+            </Link>
             <div className="flex items-center space-x-6">
               <ul className="flex space-x-6">
                 <li>
@@ -63,8 +66,8 @@ export default function RootLayout({
         <main className="max-w-5xl mx-auto px-6 py-8">{children}</main>
 
         {/* Footer */}
-        <footer className="bg-muted text-center py-6 mt-12 text-foreground-light dark:text-foreground-dark">
-          <p className="text-sm">
+        <footer className="bg-background dark:bg-background-dark border-t border-muted text-center py-6 mt-12">
+          <p className="text-sm text-foreground dark:text-foreground-dark">
             © {new Date().getFullYear()} My Name. Built with Next.js.
           </p>
           <div className="mt-2 flex justify-center space-x-4">

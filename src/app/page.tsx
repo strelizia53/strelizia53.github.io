@@ -1,16 +1,29 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <section className="text-center space-y-6">
-      <h2 className="text-4xl font-bold">Hi, I&apos;m Your Name</h2>
-      <p className="text-lg max-w-2xl mx-auto">
+    <section className="flex flex-col items-center justify-center gap-6 py-24 text-center animate-fadeIn">
+      <h1 className="text-5xl font-bold">
+        Hi, I&apos;m <span className="text-accent">Your Name</span>
+      </h1>
+      <p className="text-lg max-w-xl text-foreground/80 dark:text-foreground-dark/80">
         I&apos;m a full-stack developer focused on building modern web applications.
       </p>
-      <a
-        href="/projects"
-        className="inline-block px-6 py-3 rounded bg-accent hover:bg-muted transition-colors text-foreground-light dark:text-foreground-dark"
-      >
-        View Projects
-      </a>
+      <div className="flex gap-4">
+        <Link
+          href="/projects"
+          className="px-6 py-3 rounded-md bg-accent text-foreground hover:bg-muted transition-colors"
+        >
+          View Projects
+        </Link>
+        <Link
+          href="/contact"
+          className="px-6 py-3 rounded-md border border-foreground dark:border-foreground-dark hover:bg-muted transition-colors"
+        >
+          Contact Me
+        </Link>
+      </div>
     </section>
   );
 }
+

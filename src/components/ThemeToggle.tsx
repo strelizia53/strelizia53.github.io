@@ -23,7 +23,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="px-3 py-2 rounded bg-accent hover:bg-muted transition-colors text-foreground-light dark:text-foreground-dark"
+      className="px-3 py-2 rounded bg-accent hover:bg-muted transition-colors text-foreground dark:text-foreground-dark"
       aria-label="Toggle dark mode"
     >
       {theme === "light" ? "Dark" : "Light"} Mode
