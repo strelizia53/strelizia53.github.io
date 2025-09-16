@@ -632,3 +632,177 @@ button:focus-visible {
   background: color-mix(in srgb, #ff3b30 20%, var(--bg) 80%);
   color: var(--fg);
 }
+
+/* ------- Blog ------- */
+.blog-hero {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.blog-hero h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  letter-spacing: -0.3px;
+}
+.blog-hero p {
+  margin: 8px auto 0;
+  max-width: 60ch;
+  opacity: 0.9;
+}
+
+.blog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0 20px;
+}
+.blog-pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid color-mix(in srgb, var(--fg) 28%, transparent);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    opacity 160ms ease;
+}
+.blog-pill[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.blog-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.post-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg) 92%, var(--fg) 8%);
+  border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+  box-shadow: var(--shadow-card);
+  transition: transform 140ms ease, box-shadow 180ms ease;
+}
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+.dark .post-card:hover {
+  box-shadow: 0 10px 28px rgba(255, 255, 255, 0.08);
+}
+
+.post-title {
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: -0.2px;
+}
+.post-meta {
+  opacity: 0.75;
+  font-size: 0.92rem;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.post-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.post-excerpt {
+  margin: 0;
+  opacity: 0.92;
+}
+.post-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.read-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--fg) 28%, transparent);
+  background: transparent;
+  color: var(--fg);
+  font-weight: 700;
+  transition: background-color 160ms ease;
+}
+.read-link:hover {
+  background: color-mix(in srgb, var(--muted) 26%, transparent);
+}
+
+/* Post page */
+.post-hero {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.post-h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+}
+.post-info {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  opacity: 0.78;
+  font-size: 0.95rem;
+}
+
+.prose {
+  opacity: 0.96;
+}
+.prose p {
+  margin: 0 0 12px;
+}
+.prose h2 {
+  margin: 20px 0 8px;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  letter-spacing: -0.2px;
+}
+.prose h3 {
+  margin: 16px 0 8px;
+  font-size: 1.05rem;
+}
+.prose ul,
+.prose ol {
+  margin: 8px 0 12px 1.2rem;
+}
+.prose li {
+  margin: 6px 0;
+}
+.prose code {
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+  background: color-mix(in srgb, var(--bg) 90%, var(--fg) 10%);
+  border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
+  padding: 0 0.35rem;
+  border-radius: 6px;
+}
+.prose pre {
+  overflow: auto;
+  padding: 14px;
+  border-radius: 12px;
+  line-height: 1.4;
+  background: color-mix(in srgb, var(--bg) 88%, var(--fg) 12%);
+  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+}
