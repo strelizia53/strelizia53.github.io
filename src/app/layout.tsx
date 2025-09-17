@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
-import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
+import Navbar from "@/components/Navbar"; // ✅ client nav
+import Footer from "@/components/Footer"; // optional
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -21,73 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header className="header">
-          <div className="container nav">
-            <Link href="/" className="brand" aria-label="Go to home">
-              MyPortfolio
-            </Link>
-
-            <nav aria-label="Primary">
-              <ul className="nav-list">
-                <li>
-                  <Link href="/" className="nav-link">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/projects" className="nav-link">
-                    Projects
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="nav-link">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="nav-link">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="nav-link">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-
-            <ThemeToggle />
-          </div>
-        </header>
-
+        <Navbar />
         <main className="container" style={{ paddingBlock: "32px" }}>
           {children}
         </main>
-
-        <footer className="footer">
-          <div className="container">
-            <p style={{ margin: 0 }}>
-              © {new Date().getFullYear()} Rushaid Khan — Built with Next.js.
-            </p>
-            <div className="footer-links">
-              <a
-                href="https://github.com/yourusername"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://linkedin.com/in/yourusername"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                LinkedIn
-              </a>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

@@ -245,6 +245,54 @@ button:focus-visible {
   }
 }
 
+/* Desktop nav shows only on larger screens */
+.desktop-nav {
+  display: flex;
+}
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+/* Mobile nav hidden by default, shown when open */
+.mobile-nav {
+  display: none;
+  background: var(--bg);
+  border-top: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+}
+.mobile-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mobile-nav a {
+  padding: 8px 0;
+  font-weight: 500;
+  transition: color 160ms ease;
+}
+.mobile-nav a:hover {
+  color: var(--accent-ink);
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+  .menu-toggle {
+    display: block;
+  }
+  .mobile-nav {
+    display: block;
+  }
+}
+
 /* -------- Projects page -------- */
 .page-title {
   font-size: clamp(1.75rem, 3.8vw, 2.5rem);
