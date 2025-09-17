@@ -12,7 +12,7 @@ export default function Navbar() {
     <header className="header">
       <div className="container nav">
         <Link href="/" className="brand">
-          MyPortfolio
+          Strelizia53
         </Link>
 
         {/* Desktop Nav */}
