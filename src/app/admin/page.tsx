@@ -14,19 +14,21 @@ import {
   BlogDoc,
 } from "@/lib/firebaseHelpers";
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import Login from "@/components/Login";
 
 type ProjectWithId = { id: string; data: ProjectDoc };
 type BlogWithId = { id: string; data: BlogDoc };
 
-function AdminContent() {
-  const { logout } = useAuth();
+export default function AdminPage() {
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"projects" | "blogs">("projects");
   const [projects, setProjects] = useState<ProjectWithId[]>([]);
   const [blogs, setBlogs] = useState<BlogWithId[]>([]);
 
   useEffect(() => {
+    if (!user) return;
+
     // Subscribe to real-time updates for projects
     const unsubscribeProjects = subscribeProjects((items) => {
       setProjects(items);
@@ -42,7 +44,7 @@ function AdminContent() {
       unsubscribeProjects();
       unsubscribeBlogs();
     };
-  }, []);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -75,34 +77,41 @@ function AdminContent() {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated
+  if (!user) {
+    return <Login />;
+  }
+
+  // Show admin content if authenticated
   return (
-    <section className="container fade-in">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 text-red-500 hover:text-red-700"
-        >
+    <section className="admin-container fade-in">
+      <div className="admin-header">
+        <h1>Admin Dashboard</h1>
+        <button onClick={handleLogout} className="logout-button">
           <FiLogOut /> Logout
         </button>
       </div>
 
-      {/* Rest of your admin content remains the same */}
       {/* Tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="admin-tabs">
         <button
           onClick={() => setActiveTab("projects")}
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "projects" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
+          className={activeTab === "projects" ? "tab-active" : "tab-inactive"}
         >
           Projects
         </button>
         <button
           onClick={() => setActiveTab("blogs")}
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "blogs" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
+          className={activeTab === "blogs" ? "tab-active" : "tab-inactive"}
         >
           Blogs
         </button>
@@ -110,54 +119,45 @@ function AdminContent() {
 
       {/* Content */}
       {activeTab === "projects" && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Manage Projects</h2>
-            <Link
-              href="/admin/projects/new"
-              className="btn-primary flex items-center gap-2"
-            >
+        <div className="admin-section">
+          <div className="section-header">
+            <h2>Manage Projects</h2>
+            <Link href="/admin/projects/new" className="add-button">
               <FiPlus /> Add Project
             </Link>
           </div>
 
           {projects.length === 0 ? (
-            <p className="text-gray-500">No projects found.</p>
+            <p className="no-items">No projects found.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="items-list">
               {projects.map((p) => (
-                <li
-                  key={p.id}
-                  className="p-4 border rounded-lg flex justify-between items-center"
-                >
-                  <div>
-                    <h3 className="font-bold">{p.data.title}</h3>
-                    <p className="text-sm text-gray-500">
+                <li key={p.id} className="item-card">
+                  <div className="item-content">
+                    <h3>{p.data.title}</h3>
+                    <p className="item-description">
                       {p.data.description?.substring(0, 100)}
                       {p.data.description && p.data.description.length > 100
                         ? "..."
                         : ""}
                     </p>
-                    <div className="mt-2 flex gap-2">
+                    <div className="item-tags">
                       {p.data.tags?.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded"
-                        >
+                        <span key={tag} className="tag">
                           {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="item-actions">
                     <Link
                       href={`/admin/projects/edit/${p.id}`}
-                      className="text-blue-500"
+                      className="edit-button"
                     >
                       <FiEdit size={18} />
                     </Link>
                     <button
-                      className="text-red-500"
+                      className="delete-button"
                       onClick={() => handleDeleteProject(p.id, p.data)}
                     >
                       <FiTrash size={18} />
@@ -171,54 +171,45 @@ function AdminContent() {
       )}
 
       {activeTab === "blogs" && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Manage Blogs</h2>
-            <Link
-              href="/admin/blogs/new"
-              className="btn-primary flex items-center gap-2"
-            >
+        <div className="admin-section">
+          <div className="section-header">
+            <h2>Manage Blogs</h2>
+            <Link href="/admin/blogs/new" className="add-button">
               <FiPlus /> Add Blog
             </Link>
           </div>
 
           {blogs.length === 0 ? (
-            <p className="text-gray-500">No blog posts found.</p>
+            <p className="no-items">No blog posts found.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="items-list">
               {blogs.map((b) => (
-                <li
-                  key={b.id}
-                  className="p-4 border rounded-lg flex justify-between items-center"
-                >
-                  <div>
-                    <h3 className="font-bold">{b.data.title}</h3>
-                    <p className="text-sm text-gray-500">
+                <li key={b.id} className="item-card">
+                  <div className="item-content">
+                    <h3>{b.data.title}</h3>
+                    <p className="item-description">
                       {b.data.summary?.substring(0, 100)}
                       {b.data.summary && b.data.summary.length > 100
                         ? "..."
                         : ""}
                     </p>
-                    <div className="mt-2 flex gap-2">
+                    <div className="item-tags">
                       {b.data.tags?.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs bg-gray-100 px-2 py-1 rounded"
-                        >
+                        <span key={tag} className="tag">
                           {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="item-actions">
                     <Link
                       href={`/admin/blogs/edit/${b.id}`}
-                      className="text-blue-500"
+                      className="edit-button"
                     >
                       <FiEdit size={18} />
                     </Link>
                     <button
-                      className="text-red-500"
+                      className="delete-button"
                       onClick={() => handleDeleteBlog(b.id)}
                     >
                       <FiTrash size={18} />
@@ -231,13 +222,5 @@ function AdminContent() {
         </div>
       )}
     </section>
-  );
-}
-
-export default function AdminPage() {
-  return (
-    <ProtectedRoute>
-      <AdminContent />
-    </ProtectedRoute>
   );
 }
