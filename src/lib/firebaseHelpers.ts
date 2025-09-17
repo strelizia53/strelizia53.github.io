@@ -10,6 +10,7 @@ import {
   query,
   serverTimestamp,
   DocumentData,
+  getDoc, // Add this import
 } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import {
@@ -27,6 +28,11 @@ export type ProjectDoc = {
   category?: string;
   tags?: string[];
   stack?: string[];
+  links?: {
+    // Add links property
+    demo?: string;
+    code: string;
+  };
   imageUrl?: string;
   imagePath?: string; // storage path for deletion
   createdAt?: import("firebase/firestore").Timestamp | null;
@@ -143,4 +149,36 @@ export async function updateBlog(id: string, data: Partial<BlogDoc>) {
 export async function removeBlog(id: string) {
   const ref = doc(db, "blogs", id);
   await deleteDoc(ref);
+}
+
+// Add these to your existing firebaseHelpers.ts
+
+// Get a single project
+export async function getProject(id: string): Promise<ProjectDoc | null> {
+  try {
+    const docRef = doc(db, "projects", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as ProjectDoc;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting project:", error);
+    throw error;
+  }
+}
+
+// Get a single blog
+export async function getBlog(id: string): Promise<BlogDoc | null> {
+  try {
+    const docRef = doc(db, "blogs", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as BlogDoc;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting blog:", error);
+    throw error;
+  }
 }
