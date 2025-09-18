@@ -165,104 +165,78 @@ export default function BlogFormPage() {
 
   if (loading && action === "edit") {
     return (
-      <div className="p-6 flex items-center justify-center">
+      <section className="loading-container">
         <div className="loading-spinner"></div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-800"
-      >
-        <FiArrowLeft /> Back to Admin
-      </button>
+    <section className="admin-form-container fade-in">
+      <div className="admin-form-header">
+        <button onClick={() => router.back()} className="back-button">
+          <FiArrowLeft /> Back to Admin
+        </button>
+        <h1>{action === "new" ? "Create New Blog Post" : "Edit Blog Post"}</h1>
+      </div>
 
-      <h1 className="text-2xl font-bold mb-6">
-        {action === "new" ? "Create New Blog Post" : "Edit Blog Post"}
-      </h1>
+      {error && <div className="status error">{error}</div>}
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-4 mb-4 rounded">{error}</div>
-      )}
+      <form onSubmit={handleSubmit} className="admin-form">
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="slug">Slug (URL-friendly ID) *</label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              value={formData.slug}
+              onChange={handleInputChange}
+              required
+              placeholder="my-awesome-blog-post"
+            />
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Slug */}
-        <div>
-          <label htmlFor="slug" className="block text-sm font-medium mb-1">
-            Slug (URL-friendly ID) *
-          </label>
-          <input
-            type="text"
-            id="slug"
-            name="slug"
-            value={formData.slug}
-            onChange={handleInputChange}
-            required
-            placeholder="my-awesome-blog-post"
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
+          <div className="form-group">
+            <label htmlFor="title">Title *</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="date">Publish Date *</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="readingTime">Reading Time *</label>
+            <input
+              type="text"
+              id="readingTime"
+              name="readingTime"
+              value={formData.readingTime}
+              onChange={handleInputChange}
+              required
+              placeholder="5 min read"
+            />
+          </div>
         </div>
 
-        {/* Title */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Date */}
-        <div>
-          <label htmlFor="date" className="block text-sm font-medium mb-1">
-            Publish Date *
-          </label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value={formData.date}
-            onChange={handleInputChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Reading Time */}
-        <div>
-          <label
-            htmlFor="readingTime"
-            className="block text-sm font-medium mb-1"
-          >
-            Reading Time (e.g., &quot;5 min read&quot;) *
-          </label>
-          <input
-            type="text"
-            id="readingTime"
-            name="readingTime"
-            value={formData.readingTime}
-            onChange={handleInputChange}
-            required
-            placeholder="5 min read"
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Summary */}
-        <div>
-          <label htmlFor="summary" className="block text-sm font-medium mb-1">
-            Summary *
-          </label>
+        <div className="form-group">
+          <label htmlFor="summary">Summary *</label>
           <textarea
             id="summary"
             name="summary"
@@ -270,15 +244,11 @@ export default function BlogFormPage() {
             onChange={handleInputChange}
             required
             rows={3}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Content */}
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium mb-1">
-            Content (Markdown supported) *
-          </label>
+        <div className="form-group">
+          <label htmlFor="content">Content (Markdown supported) *</label>
           <textarea
             id="content"
             name="content"
@@ -286,20 +256,18 @@ export default function BlogFormPage() {
             onChange={handleInputChange}
             required
             rows={12}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+            className="content-textarea"
           />
         </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
-          <div className="flex gap-2 mb-2">
+        <div className="form-group">
+          <label>Tags</label>
+          <div className="input-with-button">
             <input
               type="text"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               placeholder="Add a tag"
-              className="flex-1 p-2 border border-gray-300 rounded"
               onKeyDown={(e) =>
                 e.key === "Enter" &&
                 (e.preventDefault(),
@@ -309,26 +277,23 @@ export default function BlogFormPage() {
             />
             <button
               type="button"
+              className="add-item-button"
               onClick={() => {
                 handleArrayAdd("tags", tagInput);
                 setTagInput("");
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add
             </button>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="item-list">
             {formData.tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
-              >
+              <span key={idx} className="item-tag">
                 {tag}
                 <button
                   type="button"
+                  className="remove-item"
                   onClick={() => handleArrayRemove("tags", idx)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
                 >
                   ×
                 </button>
@@ -337,20 +302,16 @@ export default function BlogFormPage() {
           </div>
         </div>
 
-        {/* Image Upload */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Featured Image
-          </label>
+        <div className="form-group">
+          <label>Featured Image</label>
           {formData.imageUrl && (
-            <div className="mb-2">
-              <Image // ✅ Replaced <img> with <Image />
+            <div className="image-preview" style={{ marginBottom: 8 }}>
+              <Image
                 src={formData.imageUrl}
                 alt="Current featured image"
-                width={300}
-                height={128}
-                className="h-32 w-auto object-cover rounded"
-                unoptimized
+                width={600}
+                height={240}
+                style={{ width: "100%", height: 160, objectFit: "cover" }}
               />
             </div>
           )}
@@ -358,30 +319,30 @@ export default function BlogFormPage() {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="w-full p-2 border border-gray-300 rounded"
+            className="file-input"
           />
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="form-help">
             {imageFile ? `Selected: ${imageFile.name}` : "No file selected"}
           </p>
         </div>
 
-        {/* Submit Button */}
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
+        <div className="form-actions">
+          <button type="submit" disabled={loading} className="submit-button">
             {loading
               ? "Saving..."
               : action === "new"
               ? "Create Blog Post"
               : "Update Blog Post"}
           </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin")}
+            className="cancel-button"
+          >
+            Cancel
+          </button>
         </div>
       </form>
-    </div>
+    </section>
   );
 }
