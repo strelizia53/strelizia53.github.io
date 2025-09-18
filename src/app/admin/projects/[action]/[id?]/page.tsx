@@ -1,4 +1,4 @@
-// src/app/admin/project/[action]/[id?]/page.tsx
+// src/app/admin/projects/[action]/[id?]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,6 +12,7 @@ import {
   deleteFile,
 } from "@/lib/firebaseHelpers";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image"; // ✅ Import Image
 
 type ProjectFormState = {
   slug: string;
@@ -614,10 +615,13 @@ export default function ProjectFormPage() {
           </label>
           {formData.imageUrl && (
             <div className="mb-2">
-              <img
+              <Image // ✅ Replaced <img> with <Image />
                 src={formData.imageUrl}
-                alt="Current"
-                className="h-32 object-cover rounded"
+                alt="Current featured image"
+                width={300}
+                height={128}
+                className="h-32 w-auto object-cover rounded"
+                unoptimized
               />
             </div>
           )}
