@@ -10,7 +10,8 @@ import {
   query,
   serverTimestamp,
   DocumentData,
-  getDoc, // Add this import
+  getDoc,
+  Timestamp, // Add this import
 } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import {
@@ -21,31 +22,38 @@ import {
 } from "firebase/storage";
 
 export type ProjectDoc = {
+  slug: string;
   title: string;
-  summary?: string;
+  year: number;
+  category: "Full-Stack" | "Frontend" | "API";
+  summary: string;
   description?: string;
-  year?: number;
-  category?: string;
-  tags?: string[];
-  stack?: string[];
-  links?: {
-    // Add links property
-    demo?: string;
-    code: string;
-  };
+  problem?: string;
+  solution?: string;
+  highlights?: string[];
+  learnings?: string[];
+  tags: string[];
+  stack: string[];
+  links: { demo: string; code: string };
+  images?: { src: string; alt: string }[];
   imageUrl?: string;
-  imagePath?: string; // storage path for deletion
-  createdAt?: import("firebase/firestore").Timestamp | null;
+  imagePath?: string;
+  createdAt?: Timestamp | null;
+  updatedAt?: Timestamp | null;
 };
 
 export type BlogDoc = {
+  slug: string;
   title: string;
-  summary?: string;
+  summary: string;
   content?: string;
-  date?: string;
-  tags?: string[];
-  readingTime?: string;
-  createdAt?: import("firebase/firestore").Timestamp | null;
+  date: string;
+  tags: string[];
+  readingTime: string;
+  createdAt?: Timestamp | null;
+  updatedAt?: Timestamp | null;
+  imageUrl?: string; // 👈 ADD THIS
+  imagePath?: string; // 👈 ADD THIS
 };
 
 const projectsCol = collection(db, "projects");
@@ -67,11 +75,7 @@ export async function deleteFile(path: string) {
     const ref = storageRef(storage, path);
     await deleteObject(ref);
   } catch (err: unknown) {
-    // handle safely — stringify for logs
-    console.warn(
-      "deleteFile error:",
-      typeof err === "string" ? err : JSON.stringify(err)
-    );
+    console.warn("deleteFile error:", err);
   }
 }
 
@@ -104,14 +108,23 @@ export function subscribeBlogs(
 }
 
 /** Add project */
-export async function addProject(data: ProjectDoc) {
-  const payload = { ...data, createdAt: serverTimestamp() };
+export async function addProject(
+  data: Omit<ProjectDoc, "createdAt" | "updatedAt">
+) {
+  const payload = {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
   const ref = await addDoc(projectsCol, payload);
   return ref.id;
 }
 
 /** Update project */
-export async function updateProject(id: string, data: Partial<ProjectDoc>) {
+export async function updateProject(
+  id: string,
+  data: Partial<Omit<ProjectDoc, "createdAt" | "updatedAt">>
+) {
   const ref = doc(db, "projects", id);
   await updateDoc(ref, {
     ...data,
@@ -121,7 +134,6 @@ export async function updateProject(id: string, data: Partial<ProjectDoc>) {
 
 /** Delete project */
 export async function removeProject(id: string, data?: ProjectDoc) {
-  // delete storage file if present
   if (data?.imagePath) {
     await deleteFile(data.imagePath);
   }
@@ -130,14 +142,21 @@ export async function removeProject(id: string, data?: ProjectDoc) {
 }
 
 /** Add blog */
-export async function addBlog(data: BlogDoc) {
-  const payload = { ...data, createdAt: serverTimestamp() };
+export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
+  const payload = {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
   const ref = await addDoc(blogsCol, payload);
   return ref.id;
 }
 
 /** Update blog */
-export async function updateBlog(id: string, data: Partial<BlogDoc>) {
+export async function updateBlog(
+  id: string,
+  data: Partial<Omit<BlogDoc, "createdAt" | "updatedAt">>
+) {
   const ref = doc(db, "blogs", id);
   await updateDoc(ref, {
     ...data,
@@ -151,9 +170,7 @@ export async function removeBlog(id: string) {
   await deleteDoc(ref);
 }
 
-// Add these to your existing firebaseHelpers.ts
-
-// Get a single project
+/** Get a single project */
 export async function getProject(id: string): Promise<ProjectDoc | null> {
   try {
     const docRef = doc(db, "projects", id);
@@ -168,7 +185,7 @@ export async function getProject(id: string): Promise<ProjectDoc | null> {
   }
 }
 
-// Get a single blog
+/** Get a single blog */
 export async function getBlog(id: string): Promise<BlogDoc | null> {
   try {
     const docRef = doc(db, "blogs", id);
