@@ -10,6 +10,7 @@ import {
   getBlog,
   uploadFile,
   deleteFile,
+  getBlogBySlug,
 } from "@/lib/firebaseHelpers";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image"; // ✅ Import Image
@@ -55,8 +56,13 @@ export default function BlogFormPage() {
   useEffect(() => {
     if (action === "edit" && id && user) {
       setLoading(true);
-      getBlog(id)
-        .then((blog) => {
+      (async () => {
+        try {
+          let blog = await getBlog(id);
+          if (!blog) {
+            const bySlug = await getBlogBySlug(id);
+            blog = bySlug?.data || null;
+          }
           if (blog) {
             setFormData({
               slug: blog.slug || "",
@@ -72,12 +78,13 @@ export default function BlogFormPage() {
           } else {
             setError("Blog post not found.");
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error("Error fetching blog:", err);
           setError("Failed to load blog post.");
-        })
-        .finally(() => setLoading(false));
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
   }, [action, id, user, today]);
 
