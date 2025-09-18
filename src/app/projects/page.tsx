@@ -1,72 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-
-type Project = {
-  title: string;
-  description: string;
-  year: number;
-  category: "Full-Stack" | "Frontend" | "API";
-  tags: string[];
-  stack: string[];
-  links: { demo?: string; code: string };
-};
-
-const PROJECTS: Project[] = [
-  {
-    title: "TaskFlow",
-    description:
-      "A full-stack task manager with auth, drag-and-drop boards, and real-time updates.",
-    year: 2025,
-    category: "Full-Stack",
-    tags: ["CRUD", "Auth", "Realtime"],
-    stack: ["Next.js", "Postgres", "Prisma", "WebSockets"],
-    links: { demo: "#", code: "https://github.com/you/taskflow" },
-  },
-  {
-    title: "MovieScope",
-    description:
-      "Frontend app to search movies, cache results, and bookmark favorites with local persistence.",
-    year: 2024,
-    category: "Frontend",
-    tags: ["Search", "Caching"],
-    stack: ["React", "Zustand", "Vite"],
-    links: { demo: "#", code: "https://github.com/you/moviescope" },
-  },
-  {
-    title: "DevNotes API",
-    description:
-      "REST API for notes with JWT auth, pagination, and rate-limiting. Includes OpenAPI docs.",
-    year: 2024,
-    category: "API",
-    tags: ["REST", "JWT", "Docs"],
-    stack: ["Node", "Express", "MongoDB", "Swagger"],
-    links: { code: "https://github.com/you/devnotes-api" },
-  },
-  {
-    title: "Shoply",
-    description:
-      "Full-stack mini-storefront with cart, checkout flow, and dashboard analytics.",
-    year: 2025,
-    category: "Full-Stack",
-    tags: ["E-commerce", "Dashboard"],
-    stack: ["Next.js", "Stripe", "PlanetScale"],
-    links: { demo: "#", code: "https://github.com/you/shoply" },
-  },
-];
+import { subscribeProjects, type ProjectDoc } from "@/lib/firebaseHelpers";
 
 const FILTERS = ["All", "Full-Stack", "Frontend", "API"] as const;
 type Filter = (typeof FILTERS)[number];
 
 export default function ProjectsPage() {
   const [filter, setFilter] = useState<Filter>("All");
+  const [projects, setProjects] = useState<
+    Array<{ id: string; data: ProjectDoc }>
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeProjects((items) => {
+      setProjects(items);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
 
   const items = useMemo(() => {
-    const sorted = [...PROJECTS].sort((a, b) => b.year - a.year);
+    const sorted = [...projects].sort(
+      (a, b) => (b.data.year || 0) - (a.data.year || 0)
+    );
     if (filter === "All") return sorted;
-    return sorted.filter((p) => p.category === filter);
-  }, [filter]);
+    return sorted.filter((p) => p.data.category === filter);
+  }, [projects, filter]);
 
   return (
     <section className="fade-in">
@@ -94,55 +56,71 @@ export default function ProjectsPage() {
       </header>
 
       <div className="projects-grid">
-        {items.map((p) => (
-          <article key={p.title} className="card">
-            <div className="thumb" aria-hidden="true" />
+        {loading ? (
+          <div className="container">Loading...</div>
+        ) : items.length === 0 ? (
+          <div className="container no-items">No projects found.</div>
+        ) : (
+          items.map((p) => (
+            <article key={p.id} className="card">
+              <div className="thumb" aria-hidden="true" />
 
-            <div className="card-header">
-              <h3>{p.title}</h3>
-              <span className="year">{p.year}</span>
-            </div>
+              <div className="card-header">
+                <h3>{p.data.title}</h3>
+                <span className="year">{p.data.year}</span>
+              </div>
 
-            <p>{p.description}</p>
+              {p.data.summary ? (
+                <p>{p.data.summary}</p>
+              ) : p.data.description ? (
+                <p>{p.data.description}</p>
+              ) : null}
 
-            <div className="tags" aria-label="Tags">
-              {p.tags.map((t) => (
-                <span key={t} className="tag">
-                  {t}
-                </span>
-              ))}
-            </div>
+              {p.data.tags?.length ? (
+                <div className="tags" aria-label="Tags">
+                  {p.data.tags.map((t) => (
+                    <span key={t} className="tag">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
-            <div className="stack" aria-label="Tech stack">
-              {p.stack.map((t) => (
-                <span key={t} className="chip">
-                  {t}
-                </span>
-              ))}
-            </div>
+              {p.data.stack?.length ? (
+                <div className="stack" aria-label="Tech stack">
+                  {p.data.stack.map((t) => (
+                    <span key={t} className="chip">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
-            <div className="card-actions">
-              {p.links.demo && (
-                <Link
-                  className="link primary"
-                  href={p.links.demo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Live Demo
-                </Link>
-              )}
-              <Link
-                className="link"
-                href={p.links.code}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Source Code
-              </Link>
-            </div>
-          </article>
-        ))}
+              <div className="card-actions">
+                {p.data.links?.demo ? (
+                  <Link
+                    className="link primary"
+                    href={p.data.links.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Live Demo
+                  </Link>
+                ) : null}
+                {p.data.links?.code ? (
+                  <Link
+                    className="link"
+                    href={p.data.links.code}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Source Code
+                  </Link>
+                ) : null}
+              </div>
+            </article>
+          ))
+        )}
       </div>
     </section>
   );

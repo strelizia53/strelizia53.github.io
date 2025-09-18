@@ -8,15 +8,17 @@ import {
   onSnapshot,
   orderBy,
   query,
+  where,
   serverTimestamp,
   DocumentData,
   getDoc,
+  getDocs,
   Timestamp, // Add this import
 } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import {
   ref as storageRef,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
@@ -61,9 +63,24 @@ const blogsCol = collection(db, "blogs");
 
 /** Upload a file to storage; returns { url, path } */
 export async function uploadFile(file: File, folder = "uploads") {
-  const path = `${folder}/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+  const safeName = file.name.replace(/\s+/g, "-");
+  const path = `${folder}/${Date.now()}-${safeName}`;
   const ref = storageRef(storage, path);
-  await uploadBytes(ref, file);
+
+  // Attach contentType to avoid ambiguous uploads and reduce preflight surprises
+  const task = uploadBytesResumable(ref, file, {
+    contentType: file.type || "application/octet-stream",
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    task.on(
+      "state_changed",
+      undefined,
+      (err) => reject(err),
+      () => resolve()
+    );
+  });
+
   const url = await getDownloadURL(ref);
   return { url, path };
 }
@@ -198,4 +215,26 @@ export async function getBlog(id: string): Promise<BlogDoc | null> {
     console.error("Error getting blog:", error);
     throw error;
   }
+}
+
+/** Get a single blog by slug */
+export async function getBlogBySlug(
+  slug: string
+): Promise<{ id: string; data: BlogDoc } | null> {
+  const q = query(blogsCol, where("slug", "==", slug));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, data: d.data() as BlogDoc };
+}
+
+/** Get a single project by slug */
+export async function getProjectBySlug(
+  slug: string
+): Promise<{ id: string; data: ProjectDoc } | null> {
+  const q = query(projectsCol, where("slug", "==", slug));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, data: d.data() as ProjectDoc };
 }
