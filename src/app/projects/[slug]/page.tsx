@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { getProjectBySlug, type ProjectDoc } from "@/lib/firebaseHelpers";
 
@@ -58,6 +59,23 @@ export default function ProjectDetailPage() {
           {p.year ? <span className="chip">{p.year}</span> : null}
         </div>
       </div>
+
+      {p.imageUrl ? (
+        <div className="gallery" style={{ marginTop: 8 }}>
+          <Image
+            src={p.imageUrl}
+            alt={p.title}
+            width={1200}
+            height={630}
+            style={{
+              width: "100%",
+              height: 320,
+              objectFit: "cover",
+              borderRadius: 12,
+            }}
+          />
+        </div>
+      ) : null}
 
       {p.summary ? <p className="prose">{p.summary}</p> : null}
       {p.description ? (

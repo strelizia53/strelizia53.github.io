@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { subscribeBlogs, type BlogDoc } from "@/lib/firebaseHelpers";
+import Image from "next/image";
 
 const ALL = "All";
 
@@ -62,6 +63,24 @@ export default function BlogPage() {
         ) : (
           items.map((p) => (
             <article key={p.id} className="post-card">
+              {p.data.imageUrl ? (
+                <div
+                  style={{
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    border:
+                      "1px solid color-mix(in srgb, var(--fg) 14%, transparent)",
+                  }}
+                >
+                  <Image
+                    src={p.data.imageUrl}
+                    alt={p.data.title}
+                    width={1200}
+                    height={630}
+                    style={{ width: "100%", height: 180, objectFit: "cover" }}
+                  />
+                </div>
+              ) : null}
               <header>
                 <h2 className="post-title">
                   <Link href={`/blog/${p.data.slug}`}>{p.data.title}</Link>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { subscribeProjects, type ProjectDoc } from "@/lib/firebaseHelpers";
 
 const FILTERS = ["All", "Full-Stack", "Frontend", "API"] as const;
@@ -63,7 +64,28 @@ export default function ProjectsPage() {
         ) : (
           items.map((p) => (
             <article key={p.id} className="card">
-              <div className="thumb" aria-hidden="true" />
+              {p.data.imageUrl ? (
+                <div
+                  className="thumb"
+                  aria-hidden="true"
+                  style={{ padding: 0 }}
+                >
+                  <Image
+                    src={p.data.imageUrl}
+                    alt={p.data.title}
+                    width={1200}
+                    height={630}
+                    style={{
+                      width: "100%",
+                      height: 140,
+                      objectFit: "cover",
+                      borderRadius: 12,
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="thumb" aria-hidden="true" />
+              )}
 
               <div className="card-header">
                 <h3>{p.data.title}</h3>
