@@ -43,6 +43,20 @@ export default function ProjectFormPage() {
   const params = useParams();
   const { action, id } = params as { action: string; id?: string };
 
+  // Debug: Try to extract ID from different possible parameter names
+  const possibleId =
+    id ||
+    (params as any).id ||
+    (params as any)["id?"] || // Handle the literal "id?" parameter name
+    (params as any).slug ||
+    (params as any).projectId;
+  console.log("Possible ID values:", { id, possibleId, allParams: params });
+
+  // Debug: Log route parameters
+  console.log("Route params:", { action, id, params });
+  console.log("Full params object:", params);
+  console.log("User:", user);
+
   const [formData, setFormData] = useState<ProjectFormState>({
     slug: "",
     title: "",
@@ -72,17 +86,28 @@ export default function ProjectFormPage() {
 
   // Fetch existing project if editing
   useEffect(() => {
-    if (action === "edit" && id && user) {
+    console.log("useEffect triggered with:", {
+      action,
+      id: possibleId,
+      user: !!user,
+    });
+    if (action === "edit" && possibleId && user) {
       setLoading(true);
+      setError("");
       (async () => {
         try {
-          let project = await getProject(id);
+          console.log("Fetching project with ID:", possibleId);
+          let project = await getProject(possibleId);
+          console.log("Direct ID fetch result:", project);
           if (!project) {
-            const bySlug = await getProjectBySlug(id);
+            console.log("Trying slug-based fetch...");
+            const bySlug = await getProjectBySlug(possibleId);
+            console.log("Slug-based fetch result:", bySlug);
             project = bySlug?.data || null;
           }
           if (project) {
-            setFormData({
+            console.log("Loaded project data:", project); // Debug log
+            const newFormData = {
               slug: project.slug || "",
               title: project.title || "",
               year: project.year || new Date().getFullYear(),
@@ -99,7 +124,9 @@ export default function ProjectFormPage() {
               imageUrl: project.imageUrl || "",
               imagePath: project.imagePath || "",
               images: project.images || [],
-            });
+            };
+            console.log("Setting form data to:", newFormData); // Debug log
+            setFormData(newFormData);
           } else {
             setError("Project not found.");
           }
@@ -110,8 +137,38 @@ export default function ProjectFormPage() {
           setLoading(false);
         }
       })();
+    } else if (action === "new") {
+      // Reset form for new project
+      console.log("Resetting form for new project");
+      setFormData({
+        slug: "",
+        title: "",
+        year: new Date().getFullYear(),
+        category: "Full-Stack",
+        summary: "",
+        description: "",
+        problem: "",
+        solution: "",
+        highlights: [],
+        learnings: [],
+        tags: [],
+        stack: [],
+        links: { demo: "", code: "" },
+        imageUrl: "",
+        imagePath: "",
+        images: [],
+      });
+      setError("");
+      setImageFile(null);
+    } else {
+      console.log("Unknown action:", action);
     }
-  }, [action, id, user]);
+  }, [action, possibleId, user]);
+
+  // Debug: Monitor formData changes
+  useEffect(() => {
+    console.log("Form data changed:", formData);
+  }, [formData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -264,6 +321,10 @@ export default function ProjectFormPage() {
               required
               placeholder="my-awesome-project"
             />
+            {/* Debug: Show current value */}
+            <small style={{ color: "red" }}>
+              Debug - Current slug value: "{formData.slug}"
+            </small>
           </div>
 
           <div className="form-group">

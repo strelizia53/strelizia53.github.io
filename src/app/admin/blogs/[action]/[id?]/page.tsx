@@ -34,6 +34,20 @@ export default function BlogFormPage() {
   const params = useParams();
   const { action, id } = params as { action: string; id?: string };
 
+  // Debug: Try to extract ID from different possible parameter names
+  const possibleId =
+    id ||
+    (params as any).id ||
+    (params as any)["id?"] || // Handle the literal "id?" parameter name
+    (params as any).slug ||
+    (params as any).blogId;
+  console.log("Possible ID values:", { id, possibleId, allParams: params });
+
+  // Debug: Log route parameters
+  console.log("Route params:", { action, id, params });
+  console.log("Full params object:", params);
+  console.log("User:", user);
+
   const today = new Date().toISOString().split("T")[0];
 
   const [formData, setFormData] = useState<BlogFormState>({
@@ -56,17 +70,28 @@ export default function BlogFormPage() {
 
   // Fetch existing blog if editing
   useEffect(() => {
-    if (action === "edit" && id && user) {
+    console.log("useEffect triggered with:", {
+      action,
+      id: possibleId,
+      user: !!user,
+    });
+    if (action === "edit" && possibleId && user) {
       setLoading(true);
+      setError("");
       (async () => {
         try {
-          let blog = await getBlog(id);
+          console.log("Fetching blog with ID:", possibleId);
+          let blog = await getBlog(possibleId);
+          console.log("Direct ID fetch result:", blog);
           if (!blog) {
-            const bySlug = await getBlogBySlug(id);
+            console.log("Trying slug-based fetch...");
+            const bySlug = await getBlogBySlug(possibleId);
+            console.log("Slug-based fetch result:", bySlug);
             blog = bySlug?.data || null;
           }
           if (blog) {
-            setFormData({
+            console.log("Loaded blog data:", blog); // Debug log
+            const newFormData = {
               slug: blog.slug || "",
               title: blog.title || "",
               summary: blog.summary || "",
@@ -77,7 +102,9 @@ export default function BlogFormPage() {
               imageUrl: blog.imageUrl || "",
               imagePath: blog.imagePath || "",
               images: blog.images || [],
-            });
+            };
+            console.log("Setting form data to:", newFormData); // Debug log
+            setFormData(newFormData);
           } else {
             setError("Blog post not found.");
           }
@@ -88,8 +115,32 @@ export default function BlogFormPage() {
           setLoading(false);
         }
       })();
+    } else if (action === "new") {
+      // Reset form for new blog
+      console.log("Resetting form for new blog");
+      setFormData({
+        slug: "",
+        title: "",
+        summary: "",
+        content: "",
+        date: today,
+        tags: [],
+        readingTime: "5 min read",
+        imageUrl: "",
+        imagePath: "",
+        images: [],
+      });
+      setError("");
+      setImageFile(null);
+    } else {
+      console.log("Unknown action:", action);
     }
-  }, [action, id, user, today]);
+  }, [action, possibleId, user, today]);
+
+  // Debug: Monitor formData changes
+  useEffect(() => {
+    console.log("Form data changed:", formData);
+  }, [formData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -206,6 +257,10 @@ export default function BlogFormPage() {
               required
               placeholder="my-awesome-blog-post"
             />
+            {/* Debug: Show current value */}
+            <small style={{ color: "red" }}>
+              Debug - Current slug value: "{formData.slug}"
+            </small>
           </div>
 
           <div className="form-group">
