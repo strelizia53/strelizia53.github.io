@@ -37,10 +37,10 @@ if (missingEnvVars.length > 0) {
 // Only initialize Firebase if we have valid environment variables
 const hasValidConfig = requiredEnvVars.every((envVar) => process.env[envVar]);
 
-let app: any = null;
-let db: any = null;
-let storage: any = null;
-let auth: any = null;
+let app: ReturnType<typeof initializeApp> | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
+let storage: ReturnType<typeof getStorage> | null = null;
+let auth: ReturnType<typeof getAuth> | null = null;
 
 if (hasValidConfig) {
   try {
