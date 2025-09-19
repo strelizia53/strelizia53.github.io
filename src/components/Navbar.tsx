@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import { FiMenu, FiX } from "react-icons/fi";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="header">
@@ -42,19 +47,21 @@ export default function Navbar() {
         </nav>
 
         {/* Mobile Menu Button */}
-        <button
-          className="menu-toggle"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-        </button>
+        {mounted && (
+          <button
+            className="menu-toggle"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+        )}
 
         <ThemeToggle />
       </div>
 
       {/* Mobile Nav Dropdown */}
-      {menuOpen && (
+      {mounted && menuOpen && (
         <nav className="mobile-nav fade-in" aria-label="Mobile Navigation">
           <ul>
             <li>

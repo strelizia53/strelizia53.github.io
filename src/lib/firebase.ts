@@ -5,54 +5,19 @@ import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "dummy-key",
-  authDomain:
-    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dummy-project",
-  storageBucket:
-    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
-    "dummy-project.appspot.com",
-  messagingSenderId:
-    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:dummy",
+  apiKey: "AIzaSyBH84a03XVsuP6pXqHKe2FTz-BPAH2st-s",
+  authDomain: "portfolio-6f936.firebaseapp.com",
+  projectId: "portfolio-6f936",
+  storageBucket: "portfolio-6f936.firebasestorage.app",
+  messagingSenderId: "3190296471",
+  appId: "1:3190296471:web:3111ec835346bd434c7ed2",
+  measurementId: "G-0E2N1ZPYHT",
 };
 
-// Validate that all required environment variables are present
-const requiredEnvVars = [
-  "NEXT_PUBLIC_FIREBASE_API_KEY",
-  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-  "NEXT_PUBLIC_FIREBASE_APP_ID",
-];
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
 
-if (missingEnvVars.length > 0) {
-  console.warn("Missing Firebase environment variables:", missingEnvVars);
-  console.warn("Firebase will not work properly without these variables.");
-}
-
-// Only initialize Firebase if we have valid environment variables
-const hasValidConfig = requiredEnvVars.every((envVar) => process.env[envVar]);
-
-let app: ReturnType<typeof initializeApp> | null = null;
-let db: ReturnType<typeof getFirestore> | null = null;
-let storage: ReturnType<typeof getStorage> | null = null;
-let auth: ReturnType<typeof getAuth> | null = null;
-
-if (hasValidConfig) {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-    storage = getStorage(app, `gs://${firebaseConfig.storageBucket}`);
-    auth = getAuth(app);
-  } catch (error) {
-    console.error("Failed to initialize Firebase:", error);
-  }
-} else {
-  console.warn("Firebase not initialized due to missing environment variables");
-}
-
-export { db, storage, auth };
+export { app, db, storage, auth };
