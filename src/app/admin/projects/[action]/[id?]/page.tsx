@@ -8,6 +8,7 @@ import {
   addProject,
   updateProject,
   getProject,
+  getProjectBySlug,
   uploadFile,
   deleteFile,
 } from "@/lib/firebaseHelpers";
@@ -33,6 +34,7 @@ type ProjectFormState = {
   };
   imageUrl?: string;
   imagePath?: string;
+  images?: { src: string; alt: string }[];
 };
 
 export default function ProjectFormPage() {
@@ -57,6 +59,7 @@ export default function ProjectFormPage() {
     links: { demo: "", code: "" },
     imageUrl: "",
     imagePath: "",
+    images: [],
   });
 
   const [highlightInput, setHighlightInput] = useState("");
@@ -71,8 +74,13 @@ export default function ProjectFormPage() {
   useEffect(() => {
     if (action === "edit" && id && user) {
       setLoading(true);
-      getProject(id)
-        .then((project) => {
+      (async () => {
+        try {
+          let project = await getProject(id);
+          if (!project) {
+            const bySlug = await getProjectBySlug(id);
+            project = bySlug?.data || null;
+          }
           if (project) {
             setFormData({
               slug: project.slug || "",
@@ -90,16 +98,18 @@ export default function ProjectFormPage() {
               links: project.links || { demo: "", code: "" },
               imageUrl: project.imageUrl || "",
               imagePath: project.imagePath || "",
+              images: project.images || [],
             });
           } else {
             setError("Project not found.");
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error("Error fetching project:", err);
           setError("Failed to load project.");
-        })
-        .finally(() => setLoading(false));
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
   }, [action, id, user]);
 
@@ -190,6 +200,7 @@ export default function ProjectFormPage() {
         ...formData,
         imageUrl: finalImageUrl,
         imagePath: finalImagePath,
+        images: formData.images || [],
         year: Number(formData.year),
         links: {
           demo: formData.links.demo || "",

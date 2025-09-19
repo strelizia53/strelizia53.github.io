@@ -25,6 +25,7 @@ type BlogFormState = {
   readingTime: string;
   imageUrl?: string;
   imagePath?: string;
+  images?: { src: string; alt: string }[];
 };
 
 export default function BlogFormPage() {
@@ -45,6 +46,7 @@ export default function BlogFormPage() {
     readingTime: "5 min read",
     imageUrl: "",
     imagePath: "",
+    images: [],
   });
 
   const [tagInput, setTagInput] = useState("");
@@ -74,6 +76,7 @@ export default function BlogFormPage() {
               readingTime: blog.readingTime || "5 min read",
               imageUrl: blog.imageUrl || "",
               imagePath: blog.imagePath || "",
+              images: blog.images || [],
             });
           } else {
             setError("Blog post not found.");
@@ -145,6 +148,7 @@ export default function BlogFormPage() {
         ...formData,
         imageUrl: finalImageUrl,
         imagePath: finalImagePath,
+        images: formData.images || [],
       };
 
       if (action === "new") {
