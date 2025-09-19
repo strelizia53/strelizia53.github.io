@@ -229,98 +229,76 @@ export default function ProjectFormPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-blue-600 hover:text-blue-800"
-      >
-        <FiArrowLeft /> Back to Admin
-      </button>
+    <section className="admin-form-container fade-in">
+      <div className="admin-form-header">
+        <button onClick={() => router.back()} className="back-button">
+          <FiArrowLeft /> Back to Admin
+        </button>
 
-      <h1 className="text-2xl font-bold mb-6">
-        {action === "new" ? "Create New Project" : "Edit Project"}
-      </h1>
+        <h1>{action === "new" ? "Create New Project" : "Edit Project"}</h1>
+      </div>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-4 mb-4 rounded">{error}</div>
-      )}
+      {error && <div className="status error">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Slug */}
-        <div>
-          <label htmlFor="slug" className="block text-sm font-medium mb-1">
-            Slug (URL-friendly ID) *
-          </label>
-          <input
-            type="text"
-            id="slug"
-            name="slug"
-            value={formData.slug}
-            onChange={handleInputChange}
-            required
-            placeholder="my-awesome-project"
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
+      <form onSubmit={handleSubmit} className="admin-form">
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="slug">Slug (URL-friendly ID) *</label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              value={formData.slug}
+              onChange={handleInputChange}
+              required
+              placeholder="my-awesome-project"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="title">Title *</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="year">Year *</label>
+            <input
+              type="number"
+              id="year"
+              name="year"
+              value={formData.year}
+              onChange={handleInputChange}
+              required
+              min="2000"
+              max={new Date().getFullYear() + 1}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="category">Category *</label>
+            <select
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="Full-Stack">Full-Stack</option>
+              <option value="Frontend">Frontend</option>
+              <option value="API">API</option>
+            </select>
+          </div>
         </div>
 
-        {/* Title */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Year */}
-        <div>
-          <label htmlFor="year" className="block text-sm font-medium mb-1">
-            Year *
-          </label>
-          <input
-            type="number"
-            id="year"
-            name="year"
-            value={formData.year}
-            onChange={handleInputChange}
-            required
-            min="2000"
-            max={new Date().getFullYear() + 1}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Category */}
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium mb-1">
-            Category *
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Full-Stack">Full-Stack</option>
-            <option value="Frontend">Frontend</option>
-            <option value="API">API</option>
-          </select>
-        </div>
-
-        {/* Summary */}
-        <div>
-          <label htmlFor="summary" className="block text-sm font-medium mb-1">
-            Summary *
-          </label>
+        <div className="form-group">
+          <label htmlFor="summary">Summary *</label>
           <textarea
             id="summary"
             name="summary"
@@ -328,68 +306,52 @@ export default function ProjectFormPage() {
             onChange={handleInputChange}
             required
             rows={3}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Description */}
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium mb-1"
-          >
-            Description
-          </label>
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
           <textarea
             id="description"
             name="description"
             value={formData.description || ""}
             onChange={handleInputChange}
             rows={4}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Problem */}
-        <div>
-          <label htmlFor="problem" className="block text-sm font-medium mb-1">
-            Problem Statement
-          </label>
-          <textarea
-            id="problem"
-            name="problem"
-            value={formData.problem || ""}
-            onChange={handleInputChange}
-            rows={3}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="problem">Problem Statement</label>
+            <textarea
+              id="problem"
+              name="problem"
+              value={formData.problem || ""}
+              onChange={handleInputChange}
+              rows={3}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="solution">Solution</label>
+            <textarea
+              id="solution"
+              name="solution"
+              value={formData.solution || ""}
+              onChange={handleInputChange}
+              rows={3}
+            />
+          </div>
         </div>
 
-        {/* Solution */}
-        <div>
-          <label htmlFor="solution" className="block text-sm font-medium mb-1">
-            Solution
-          </label>
-          <textarea
-            id="solution"
-            name="solution"
-            value={formData.solution || ""}
-            onChange={handleInputChange}
-            rows={3}
-            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Highlights */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Highlights</label>
-          <div className="flex gap-2 mb-2">
+        <div className="form-group">
+          <label>Highlights</label>
+          <div className="input-with-button">
             <input
               type="text"
               value={highlightInput}
               onChange={(e) => setHighlightInput(e.target.value)}
               placeholder="Add a highlight"
-              className="flex-1 p-2 border border-gray-300 rounded"
               onKeyDown={(e) =>
                 e.key === "Enter" &&
                 (e.preventDefault(),
@@ -399,26 +361,23 @@ export default function ProjectFormPage() {
             />
             <button
               type="button"
+              className="add-item-button"
               onClick={() => {
                 handleArrayAdd("highlights", highlightInput);
                 setHighlightInput("");
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add
             </button>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="item-list">
             {formData.highlights?.map((item, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
-              >
+              <span key={idx} className="highlight-item">
                 {item}
                 <button
                   type="button"
+                  className="remove-item"
                   onClick={() => handleArrayRemove("highlights", idx)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
                 >
                   ×
                 </button>
@@ -427,18 +386,14 @@ export default function ProjectFormPage() {
           </div>
         </div>
 
-        {/* Learnings */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Key Learnings
-          </label>
-          <div className="flex gap-2 mb-2">
+        <div className="form-group">
+          <label>Key Learnings</label>
+          <div className="input-with-button">
             <input
               type="text"
               value={learningInput}
               onChange={(e) => setLearningInput(e.target.value)}
               placeholder="Add a learning"
-              className="flex-1 p-2 border border-gray-300 rounded"
               onKeyDown={(e) =>
                 e.key === "Enter" &&
                 (e.preventDefault(),
@@ -448,26 +403,23 @@ export default function ProjectFormPage() {
             />
             <button
               type="button"
+              className="add-item-button"
               onClick={() => {
                 handleArrayAdd("learnings", learningInput);
                 setLearningInput("");
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Add
             </button>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="item-list">
             {formData.learnings?.map((item, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
-              >
+              <span key={idx} className="highlight-item">
                 {item}
                 <button
                   type="button"
+                  className="remove-item"
                   onClick={() => handleArrayRemove("learnings", idx)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
                 >
                   ×
                 </button>
@@ -476,109 +428,95 @@ export default function ProjectFormPage() {
           </div>
         </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Tags</label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder="Add a tag"
-              className="flex-1 p-2 border border-gray-300 rounded"
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (e.preventDefault(),
-                handleArrayAdd("tags", tagInput),
-                setTagInput(""))
-              }
-            />
-            <button
-              type="button"
-              onClick={() => {
-                handleArrayAdd("tags", tagInput);
-                setTagInput("");
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Add
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.tags.map((tag, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Tags</label>
+            <div className="input-with-button">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                placeholder="Add a tag"
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  (e.preventDefault(),
+                  handleArrayAdd("tags", tagInput),
+                  setTagInput(""))
+                }
+              />
+              <button
+                type="button"
+                className="add-item-button"
+                onClick={() => {
+                  handleArrayAdd("tags", tagInput);
+                  setTagInput("");
+                }}
               >
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleArrayRemove("tags", idx)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+                Add
+              </button>
+            </div>
+            <div className="item-list">
+              {formData.tags.map((tag, idx) => (
+                <span key={idx} className="item-tag">
+                  {tag}
+                  <button
+                    type="button"
+                    className="remove-item"
+                    onClick={() => handleArrayRemove("tags", idx)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Stack */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Tech Stack</label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={stackInput}
-              onChange={(e) => setStackInput(e.target.value)}
-              placeholder="Add a tech (e.g., React, Node.js)"
-              className="flex-1 p-2 border border-gray-300 rounded"
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (e.preventDefault(),
-                handleArrayAdd("stack", stackInput),
-                setStackInput(""))
-              }
-            />
-            <button
-              type="button"
-              onClick={() => {
-                handleArrayAdd("stack", stackInput);
-                setStackInput("");
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Add
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.stack.map((tech, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center gap-1 bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
+          <div className="form-group">
+            <label>Tech Stack</label>
+            <div className="input-with-button">
+              <input
+                type="text"
+                value={stackInput}
+                onChange={(e) => setStackInput(e.target.value)}
+                placeholder="Add a tech (e.g., React, Node.js)"
+                onKeyDown={(e) =>
+                  e.key === "Enter" &&
+                  (e.preventDefault(),
+                  handleArrayAdd("stack", stackInput),
+                  setStackInput(""))
+                }
+              />
+              <button
+                type="button"
+                className="add-item-button"
+                onClick={() => {
+                  handleArrayAdd("stack", stackInput);
+                  setStackInput("");
+                }}
               >
-                {tech}
-                <button
-                  type="button"
-                  onClick={() => handleArrayRemove("stack", idx)}
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+                Add
+              </button>
+            </div>
+            <div className="item-list">
+              {formData.stack.map((tech, idx) => (
+                <span key={idx} className="item-chip">
+                  {tech}
+                  <button
+                    type="button"
+                    className="remove-item"
+                    onClick={() => handleArrayRemove("stack", idx)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="links.demo"
-              className="block text-sm font-medium mb-1"
-            >
-              Live Demo URL
-            </label>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="links.demo">Live Demo URL</label>
             <input
               type="url"
               id="links.demo"
@@ -586,16 +524,10 @@ export default function ProjectFormPage() {
               value={formData.links.demo}
               onChange={handleInputChange}
               placeholder="https://example.com"
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label
-              htmlFor="links.code"
-              className="block text-sm font-medium mb-1"
-            >
-              GitHub URL
-            </label>
+          <div className="form-group">
+            <label htmlFor="links.code">GitHub URL</label>
             <input
               type="url"
               id="links.code"
@@ -603,19 +535,15 @@ export default function ProjectFormPage() {
               value={formData.links.code}
               onChange={handleInputChange}
               placeholder="https://github.com/username/repo"
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
-        {/* Image Upload */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Featured Image
-          </label>
+        <div className="form-group">
+          <label>Featured Image</label>
           {formData.imageUrl && (
-            <div className="mb-2">
-              <Image // ✅ Replaced <img> with <Image />
+            <div className="mb-4">
+              <Image
                 src={formData.imageUrl}
                 alt="Current featured image"
                 width={300}
@@ -629,22 +557,15 @@ export default function ProjectFormPage() {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="w-full p-2 border border-gray-300 rounded"
+            className="file-input"
           />
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="form-help">
             {imageFile ? `Selected: ${imageFile.name}` : "No file selected"}
           </p>
         </div>
 
-        {/* Submit Button */}
-        <div className="pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
+        <div className="form-actions">
+          <button type="submit" disabled={loading} className="submit-button">
             {loading
               ? "Saving..."
               : action === "new"
@@ -653,6 +574,6 @@ export default function ProjectFormPage() {
           </button>
         </div>
       </form>
-    </div>
+    </section>
   );
 }
