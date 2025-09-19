@@ -83,7 +83,7 @@ export async function uploadFile(file: File, folder = "uploads") {
 
   const safeName = file.name.replace(/\s+/g, "-");
   const path = `${folder}/${Date.now()}-${safeName}`;
-  const ref = storageRef(storage, path);
+  const ref = storageRef(storage!, path);
 
   // Attach contentType to avoid ambiguous uploads and reduce preflight surprises
   const task = uploadBytesResumable(ref, file, {
@@ -112,7 +112,7 @@ export async function deleteFile(path: string) {
   }
 
   try {
-    const ref = storageRef(storage, path);
+    const ref = storageRef(storage!, path);
     await deleteObject(ref);
   } catch (err: unknown) {
     console.warn("deleteFile error:", err);
@@ -175,6 +175,12 @@ export async function updateProject(
   id: string,
   data: Partial<Omit<ProjectDoc, "createdAt" | "updatedAt">>
 ) {
+  if (!isFirebaseInitialized() || !db) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const ref = doc(db, "projects", id);
   await updateDoc(ref, {
     ...data,
@@ -184,6 +190,12 @@ export async function updateProject(
 
 /** Delete project */
 export async function removeProject(id: string, data?: ProjectDoc) {
+  if (!isFirebaseInitialized() || !db) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   if (data?.imagePath) {
     await deleteFile(data.imagePath);
   }
@@ -207,6 +219,12 @@ export async function updateBlog(
   id: string,
   data: Partial<Omit<BlogDoc, "createdAt" | "updatedAt">>
 ) {
+  if (!isFirebaseInitialized() || !db) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const ref = doc(db, "blogs", id);
   await updateDoc(ref, {
     ...data,
@@ -216,12 +234,23 @@ export async function updateBlog(
 
 /** Delete blog */
 export async function removeBlog(id: string) {
+  if (!isFirebaseInitialized() || !db) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const ref = doc(db, "blogs", id);
   await deleteDoc(ref);
 }
 
 /** Get a single project */
 export async function getProject(id: string): Promise<ProjectDoc | null> {
+  if (!isFirebaseInitialized() || !db) {
+    console.warn("Firebase not initialized. Cannot get project.");
+    return null;
+  }
+
   try {
     const docRef = doc(db, "projects", id);
     const docSnap = await getDoc(docRef);
@@ -237,6 +266,11 @@ export async function getProject(id: string): Promise<ProjectDoc | null> {
 
 /** Get a single blog */
 export async function getBlog(id: string): Promise<BlogDoc | null> {
+  if (!isFirebaseInitialized() || !db) {
+    console.warn("Firebase not initialized. Cannot get blog.");
+    return null;
+  }
+
   try {
     const docRef = doc(db, "blogs", id);
     const docSnap = await getDoc(docRef);
@@ -254,6 +288,11 @@ export async function getBlog(id: string): Promise<BlogDoc | null> {
 export async function getBlogBySlug(
   slug: string
 ): Promise<{ id: string; data: BlogDoc } | null> {
+  if (!isFirebaseInitialized() || !blogsCol) {
+    console.warn("Firebase not initialized. Cannot get blog by slug.");
+    return null;
+  }
+
   const q = query(blogsCol, where("slug", "==", slug));
   const snap = await getDocs(q);
   if (snap.empty) return null;
@@ -265,6 +304,11 @@ export async function getBlogBySlug(
 export async function getProjectBySlug(
   slug: string
 ): Promise<{ id: string; data: ProjectDoc } | null> {
+  if (!isFirebaseInitialized() || !projectsCol) {
+    console.warn("Firebase not initialized. Cannot get project by slug.");
+    return null;
+  }
+
   const q = query(projectsCol, where("slug", "==", slug));
   const snap = await getDocs(q);
   if (snap.empty) return null;
