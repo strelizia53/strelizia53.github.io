@@ -6,6 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { getBlogBySlug, type BlogDoc } from "@/lib/firebaseHelpers";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -33,7 +35,10 @@ export default function BlogPostPage() {
   if (loading) {
     return (
       <section className="container fade-in">
-        <div>Loading...</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading blog post...</p>
+        </div>
       </section>
     );
   }
@@ -54,26 +59,20 @@ export default function BlogPostPage() {
       </div>
 
       {post.images?.length ? (
-        <div className="gallery" style={{ marginTop: 8 }}>
-          {/* Simple carousel: show first, arrows to navigate */}
+        <div className="gallery">
           <Carousel images={post.images} />
         </div>
       ) : post.imageUrl ? (
-        <div
-          style={{
-            marginBottom: 12,
-            borderRadius: 12,
-            overflow: "hidden",
-            border: "1px solid color-mix(in srgb, var(--fg) 14%, transparent)",
-          }}
-        >
-          <Image
-            src={post.imageUrl}
-            alt={post.title}
-            width={1600}
-            height={900}
-            style={{ width: "100%", height: "auto", objectFit: "contain" }}
-          />
+        <div className="gallery">
+          <div className="carousel-container">
+            <Image
+              src={post.imageUrl}
+              alt={post.title}
+              width={1600}
+              height={900}
+              className="carousel-image"
+            />
+          </div>
         </div>
       ) : null}
 
@@ -87,16 +86,22 @@ export default function BlogPostPage() {
         </div>
       ) : null}
 
-      <div className="prose" style={{ marginTop: 12 }}>
-        {post.summary ? <p>{post.summary}</p> : null}
-        {post.content ? (
-          <p style={{ whiteSpace: "pre-wrap" }}>{post.content}</p>
-        ) : null}
+      <div className="blog-content">
+        <div className="prose">
+          {post.summary ? <p>{post.summary}</p> : null}
+          {post.content ? (
+            <div className="markdown-content">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {post.content}
+              </ReactMarkdown>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      <div className="post-actions" style={{ marginTop: 16 }}>
+      <div className="post-actions">
         <Link className="read-link" href="/blog">
-          Back to Blog
+          ← Back to Blog
         </Link>
       </div>
     </section>
@@ -111,38 +116,27 @@ function Carousel({ images }: { images: { src: string; alt: string }[] }) {
   const current = images[index];
 
   return (
-    <div style={{ position: "relative" }}>
-      <div
-        style={{
-          borderRadius: 12,
-          overflow: "hidden",
-          border: "1px solid color-mix(in srgb, var(--fg) 14%, transparent)",
-        }}
-      >
-        <Image
-          src={current.src}
-          alt={current.alt}
-          width={1600}
-          height={900}
-          style={{ width: "100%", height: "auto", objectFit: "contain" }}
-        />
-      </div>
-      {total > 1 ? (
-        <div
-          className="card-actions"
-          style={{ justifyContent: "space-between", marginTop: 8 }}
-        >
-          <button className="link" onClick={prev} type="button">
-            Prev
+    <div className="carousel-container">
+      <Image
+        src={current.src}
+        alt={current.alt}
+        width={1600}
+        height={900}
+        className="carousel-image"
+      />
+      {total > 1 && (
+        <div className="carousel-controls">
+          <button className="carousel-button" onClick={prev} type="button">
+            ← Previous
           </button>
-          <span className="chip">
+          <span className="carousel-indicator">
             {index + 1} / {total}
           </span>
-          <button className="link" onClick={next} type="button">
-            Next
+          <button className="carousel-button" onClick={next} type="button">
+            Next →
           </button>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

@@ -87,18 +87,15 @@ export default function ProjectDetailPage() {
         </div>
       ) : p.imageUrl ? (
         <div className="gallery">
-          <Image
-            src={p.imageUrl}
-            alt={p.title}
-            width={1600}
-            height={900}
-            style={{
-              width: "100%",
-              height: "auto",
-              objectFit: "contain",
-              borderRadius: 12,
-            }}
-          />
+          <div className="carousel-container">
+            <Image
+              src={p.imageUrl}
+              alt={p.title}
+              width={1600}
+              height={900}
+              className="carousel-image"
+            />
+          </div>
         </div>
       ) : null}
 
@@ -256,34 +253,23 @@ function Carousel({ images }: { images: { src: string; alt: string }[] }) {
   const current = images[index];
 
   return (
-    <div style={{ position: "relative" }}>
-      <div
-        style={{
-          borderRadius: 12,
-          overflow: "hidden",
-          border: "1px solid color-mix(in srgb, var(--fg) 14%, transparent)",
-        }}
-      >
-        <Image
-          src={current.src}
-          alt={current.alt}
-          width={1600}
-          height={900}
-          style={{ width: "100%", height: "auto", objectFit: "contain" }}
-        />
-      </div>
+    <div className="carousel-container">
+      <Image
+        src={current.src}
+        alt={current.alt}
+        width={1600}
+        height={900}
+        className="carousel-image"
+      />
       {total > 1 && (
-        <div
-          className="card-actions"
-          style={{ justifyContent: "space-between", marginTop: 16 }}
-        >
-          <button className="link" onClick={prev} type="button">
+        <div className="carousel-controls">
+          <button className="carousel-button" onClick={prev} type="button">
             ← Previous
           </button>
-          <span className="chip">
+          <span className="carousel-indicator">
             {index + 1} / {total}
           </span>
-          <button className="link" onClick={next} type="button">
+          <button className="carousel-button" onClick={next} type="button">
             Next →
           </button>
         </div>

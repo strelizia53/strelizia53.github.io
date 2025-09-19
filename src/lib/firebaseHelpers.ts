@@ -167,8 +167,13 @@ export async function addProject(
     );
   }
 
+  // Filter out undefined values to avoid Firestore errors
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  );
+
   const payload = {
-    ...data,
+    ...cleanData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
@@ -187,9 +192,14 @@ export async function updateProject(
     );
   }
 
+  // Filter out undefined values to avoid Firestore errors
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  );
+
   const ref = doc(db, "projects", id);
   await updateDoc(ref, {
-    ...data,
+    ...cleanData,
     updatedAt: serverTimestamp(),
   } as DocumentData);
 }
@@ -217,8 +227,13 @@ export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
     );
   }
 
+  // Filter out undefined values to avoid Firestore errors
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  );
+
   const payload = {
-    ...data,
+    ...cleanData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
@@ -237,9 +252,14 @@ export async function updateBlog(
     );
   }
 
+  // Filter out undefined values to avoid Firestore errors
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  );
+
   const ref = doc(db, "blogs", id);
   await updateDoc(ref, {
-    ...data,
+    ...cleanData,
     updatedAt: serverTimestamp(),
   } as DocumentData);
 }
