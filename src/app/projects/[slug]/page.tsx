@@ -6,6 +6,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { getProjectBySlug, type ProjectDoc } from "@/lib/firebaseHelpers";
+import {
+  FiArrowLeft,
+  FiExternalLink,
+  FiGithub,
+  FiCalendar,
+  FiTag,
+} from "react-icons/fi";
 
 export default function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -35,7 +42,10 @@ export default function ProjectDetailPage() {
   if (loading) {
     return (
       <section className="container fade-in">
-        <div>Loading...</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading project...</p>
+        </div>
       </section>
     );
   }
@@ -46,26 +56,37 @@ export default function ProjectDetailPage() {
 
   return (
     <section className="container fade-in">
+      {/* Breadcrumb Navigation */}
       <nav className="breadcrumbs">
-        <Link href="/projects">Projects</Link>
+        <Link href="/projects">
+          <FiArrowLeft size={16} style={{ marginRight: 4 }} />
+          Projects
+        </Link>
         <span>/</span>
         <span>{p.title}</span>
       </nav>
 
+      {/* Project Hero Section */}
       <div className="project-hero">
         <h1 className="project-title">{p.title}</h1>
         <div className="meta">
           <span className="badge">{p.category}</span>
-          {p.year ? <span className="chip">{p.year}</span> : null}
+          {p.year && (
+            <span className="chip">
+              <FiCalendar size={12} style={{ marginRight: 4 }} />
+              {p.year}
+            </span>
+          )}
         </div>
       </div>
 
+      {/* Project Gallery */}
       {p.images?.length ? (
-        <div className="gallery" style={{ marginTop: 8 }}>
+        <div className="gallery">
           <Carousel images={p.images} />
         </div>
       ) : p.imageUrl ? (
-        <div className="gallery" style={{ marginTop: 8 }}>
+        <div className="gallery">
           <Image
             src={p.imageUrl}
             alt={p.title}
@@ -81,42 +102,47 @@ export default function ProjectDetailPage() {
         </div>
       ) : null}
 
-      {p.summary ? (
+      {/* Project Summary */}
+      {p.summary && (
         <div className="section">
           <div className="prose">
             <p>{p.summary}</p>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.description ? (
+      {/* Project Description */}
+      {p.description && (
         <div className="section">
           <h2>Overview</h2>
           <div className="prose">
             <p>{p.description}</p>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.problem ? (
+      {/* Problem Section */}
+      {p.problem && (
         <div className="section">
           <h2>Problem</h2>
           <div className="prose">
             <p>{p.problem}</p>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.solution ? (
+      {/* Solution Section */}
+      {p.solution && (
         <div className="section">
           <h2>Solution</h2>
           <div className="prose">
             <p>{p.solution}</p>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.highlights?.length ? (
+      {/* Highlights Section */}
+      {p.highlights?.length && (
         <div className="section">
           <h2>Highlights</h2>
           <div className="prose">
@@ -127,9 +153,10 @@ export default function ProjectDetailPage() {
             </ul>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.learnings?.length ? (
+      {/* Learnings Section */}
+      {p.learnings?.length && (
         <div className="section">
           <h2>Learnings</h2>
           <div className="prose">
@@ -140,11 +167,18 @@ export default function ProjectDetailPage() {
             </ul>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.tags?.length ? (
+      {/* Tags Section */}
+      {p.tags?.length && (
         <div className="section">
-          <h2>Tags</h2>
+          <h2>
+            <FiTag
+              size={20}
+              style={{ marginRight: 8, verticalAlign: "middle" }}
+            />
+            Tags
+          </h2>
           <div className="tags">
             {p.tags.map((t) => (
               <span key={t} className="tag">
@@ -153,60 +187,67 @@ export default function ProjectDetailPage() {
             ))}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.stack?.length ? (
+      {/* Tech Stack Section */}
+      {p.stack?.length && (
         <div className="section">
           <h2>Tech Stack</h2>
           <div className="stack">
-            {p.stack.map((t) => (
-              <span key={t} className="chip">
-                {t}
+            {p.stack.map((tech) => (
+              <span key={tech} className="chip">
+                {tech}
               </span>
             ))}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {p.links?.demo || p.links?.code ? (
+      {/* Links Section */}
+      {(p.links?.demo || p.links?.code) && (
         <div className="section">
           <h2>Links</h2>
           <div className="card-actions">
-            {p.links?.demo ? (
+            {p.links?.demo && (
               <Link
                 className="link primary"
                 href={p.links.demo}
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <FiExternalLink size={16} style={{ marginRight: 8 }} />
                 Live Demo
               </Link>
-            ) : null}
-            {p.links?.code ? (
+            )}
+            {p.links?.code && (
               <Link
                 className="link"
                 href={p.links.code}
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <FiGithub size={16} style={{ marginRight: 8 }} />
                 Source Code
               </Link>
-            ) : null}
+            )}
           </div>
         </div>
-      ) : null}
+      )}
 
       <div className="divider" />
 
+      {/* Back Navigation */}
       <div className="card-actions">
         <Link className="link" href="/projects">
-          ← Back to Projects
+          <FiArrowLeft size={16} style={{ marginRight: 8 }} />
+          Back to Projects
         </Link>
       </div>
     </section>
   );
 }
 
+// Enhanced Carousel Component
 function Carousel({ images }: { images: { src: string; alt: string }[] }) {
   const [index, setIndex] = useState(0);
   const total = images.length;
@@ -231,22 +272,22 @@ function Carousel({ images }: { images: { src: string; alt: string }[] }) {
           style={{ width: "100%", height: "auto", objectFit: "contain" }}
         />
       </div>
-      {total > 1 ? (
+      {total > 1 && (
         <div
           className="card-actions"
-          style={{ justifyContent: "space-between", marginTop: 8 }}
+          style={{ justifyContent: "space-between", marginTop: 16 }}
         >
           <button className="link" onClick={prev} type="button">
-            Prev
+            ← Previous
           </button>
           <span className="chip">
             {index + 1} / {total}
           </span>
           <button className="link" onClick={next} type="button">
-            Next
+            Next →
           </button>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
