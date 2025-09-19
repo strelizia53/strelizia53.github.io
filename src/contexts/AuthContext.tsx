@@ -34,6 +34,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -43,6 +48,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
+    if (!auth) {
+      throw new Error(
+        "Authentication not available. Please check your Firebase configuration."
+      );
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
@@ -52,6 +63,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error(
+        "Authentication not available. Please check your Firebase configuration."
+      );
+    }
+
     try {
       await signOut(auth);
     } catch (error) {
