@@ -16,6 +16,17 @@ import {
   Timestamp, // Add this import
 } from "firebase/firestore";
 import { db, storage } from "./firebase";
+
+// Helper function to check if Firebase is initialized
+const isFirebaseInitialized = () => {
+  if (!db || !storage) {
+    console.warn(
+      "Firebase not initialized. Please check your environment variables."
+    );
+    return false;
+  }
+  return true;
+};
 import {
   ref as storageRef,
   uploadBytesResumable,
@@ -59,11 +70,17 @@ export type BlogDoc = {
   images?: { src: string; alt: string }[];
 };
 
-const projectsCol = collection(db, "projects");
-const blogsCol = collection(db, "blogs");
+const projectsCol = db ? collection(db, "projects") : null;
+const blogsCol = db ? collection(db, "blogs") : null;
 
 /** Upload a file to storage; returns { url, path } */
 export async function uploadFile(file: File, folder = "uploads") {
+  if (!isFirebaseInitialized()) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const safeName = file.name.replace(/\s+/g, "-");
   const path = `${folder}/${Date.now()}-${safeName}`;
   const ref = storageRef(storage, path);
@@ -89,6 +106,11 @@ export async function uploadFile(file: File, folder = "uploads") {
 /** Delete file from storage by path */
 export async function deleteFile(path: string) {
   if (!path) return;
+  if (!isFirebaseInitialized()) {
+    console.warn("Firebase not initialized. Cannot delete file.");
+    return;
+  }
+
   try {
     const ref = storageRef(storage, path);
     await deleteObject(ref);
@@ -101,6 +123,11 @@ export async function deleteFile(path: string) {
 export function subscribeProjects(
   onUpdate: (items: { id: string; data: ProjectDoc }[]) => void
 ) {
+  if (!isFirebaseInitialized() || !projectsCol) {
+    onUpdate([]);
+    return () => {};
+  }
+
   const q = query(projectsCol, orderBy("createdAt", "desc"));
   return onSnapshot(q, (snapshot) => {
     const items = snapshot.docs.map((d) => ({
@@ -115,6 +142,11 @@ export function subscribeProjects(
 export function subscribeBlogs(
   onUpdate: (items: { id: string; data: BlogDoc }[]) => void
 ) {
+  if (!isFirebaseInitialized() || !blogsCol) {
+    onUpdate([]);
+    return () => {};
+  }
+
   const q = query(blogsCol, orderBy("createdAt", "desc"));
   return onSnapshot(q, (snapshot) => {
     const items = snapshot.docs.map((d) => ({

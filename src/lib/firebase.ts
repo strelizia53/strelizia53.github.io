@@ -34,9 +34,25 @@ if (missingEnvVars.length > 0) {
   console.warn("Firebase will not work properly without these variables.");
 }
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Only initialize Firebase if we have valid environment variables
+const hasValidConfig = requiredEnvVars.every((envVar) => process.env[envVar]);
 
-export const db = getFirestore(app);
-// Explicitly bind storage to the configured bucket to avoid bucket mismatches
-export const storage = getStorage(app, `gs://${firebaseConfig.storageBucket}`);
-export const auth = getAuth(app);
+let app: any = null;
+let db: any = null;
+let storage: any = null;
+let auth: any = null;
+
+if (hasValidConfig) {
+  try {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    storage = getStorage(app, `gs://${firebaseConfig.storageBucket}`);
+    auth = getAuth(app);
+  } catch (error) {
+    console.error("Failed to initialize Firebase:", error);
+  }
+} else {
+  console.warn("Firebase not initialized due to missing environment variables");
+}
+
+export { db, storage, auth };
