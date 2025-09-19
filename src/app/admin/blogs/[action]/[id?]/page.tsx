@@ -1,7 +1,7 @@
 // src/app/admin/blogs/[action]/[id?]/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import {
@@ -35,18 +35,18 @@ export default function BlogFormPage() {
   const { action, id } = params as { action: string; id?: string };
 
   // Debug: Try to extract ID from different possible parameter names
-  const possibleId =
-    id ||
-    (params as any).id ||
-    (params as any)["id?"] || // Handle the literal "id?" parameter name
-    (params as any).slug ||
-    (params as any).blogId;
-  console.log("Possible ID values:", { id, possibleId, allParams: params });
+  const possibleId = useMemo(() => {
+    const extractedId =
+      id ||
+      (params as any).id ||
+      (params as any)["id?"] || // Handle the literal "id?" parameter name
+      (params as any).slug ||
+      (params as any).blogId;
+    // Debug log removed to prevent re-renders
+    return extractedId;
+  }, [id, params]);
 
-  // Debug: Log route parameters
-  console.log("Route params:", { action, id, params });
-  console.log("Full params object:", params);
-  console.log("User:", user);
+  // Debug logs removed to prevent re-renders
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -67,30 +67,21 @@ export default function BlogFormPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [hasLoadedData, setHasLoadedData] = useState(false);
 
   // Fetch existing blog if editing
   useEffect(() => {
-    console.log("useEffect triggered with:", {
-      action,
-      id: possibleId,
-      user: !!user,
-    });
-    if (action === "edit" && possibleId && user) {
+    if (action === "edit" && possibleId && user && !hasLoadedData) {
       setLoading(true);
       setError("");
       (async () => {
         try {
-          console.log("Fetching blog with ID:", possibleId);
           let blog = await getBlog(possibleId);
-          console.log("Direct ID fetch result:", blog);
           if (!blog) {
-            console.log("Trying slug-based fetch...");
             const bySlug = await getBlogBySlug(possibleId);
-            console.log("Slug-based fetch result:", bySlug);
             blog = bySlug?.data || null;
           }
           if (blog) {
-            console.log("Loaded blog data:", blog); // Debug log
             const newFormData = {
               slug: blog.slug || "",
               title: blog.title || "",
@@ -103,8 +94,8 @@ export default function BlogFormPage() {
               imagePath: blog.imagePath || "",
               images: blog.images || [],
             };
-            console.log("Setting form data to:", newFormData); // Debug log
             setFormData(newFormData);
+            setHasLoadedData(true);
           } else {
             setError("Blog post not found.");
           }
@@ -117,7 +108,6 @@ export default function BlogFormPage() {
       })();
     } else if (action === "new") {
       // Reset form for new blog
-      console.log("Resetting form for new blog");
       setFormData({
         slug: "",
         title: "",
@@ -132,15 +122,8 @@ export default function BlogFormPage() {
       });
       setError("");
       setImageFile(null);
-    } else {
-      console.log("Unknown action:", action);
     }
-  }, [action, possibleId, user, today]);
-
-  // Debug: Monitor formData changes
-  useEffect(() => {
-    console.log("Form data changed:", formData);
-  }, [formData]);
+  }, [action, possibleId, user, today, hasLoadedData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -177,6 +160,11 @@ export default function BlogFormPage() {
     e.preventDefault();
     if (!user) return;
 
+    console.log("🚀 BLOG FORM SUBMISSION STARTED");
+    console.log("📝 Form data being submitted:", formData);
+    console.log("🔧 Action:", action);
+    console.log("🆔 Possible ID:", possibleId);
+
     setLoading(true);
     setError("");
 
@@ -203,11 +191,25 @@ export default function BlogFormPage() {
       };
 
       if (action === "new") {
-        await addBlog(payload);
+        console.log("🆕 Creating new blog...");
+        console.log("📦 Payload for new blog:", payload);
+        const newId = await addBlog(payload);
+        console.log("✅ Blog created with ID:", newId);
         alert("Blog post created successfully!");
-      } else if (action === "edit" && id) {
-        await updateBlog(id, payload);
+      } else if (action === "edit" && possibleId) {
+        console.log("✏️ Updating existing blog...");
+        console.log("📦 Payload for update:", payload);
+        console.log("🆔 Updating blog with ID:", possibleId);
+        await updateBlog(possibleId, payload);
+        console.log("✅ Blog updated successfully");
         alert("Blog post updated successfully!");
+      } else {
+        console.error("❌ Invalid action or missing ID for edit:", {
+          action,
+          possibleId,
+        });
+        setError("Invalid action or missing ID for edit.");
+        return;
       }
 
       router.push("/admin");

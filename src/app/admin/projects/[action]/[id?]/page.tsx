@@ -1,7 +1,7 @@
 // src/app/admin/projects/[action]/[id?]/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import {
@@ -44,18 +44,18 @@ export default function ProjectFormPage() {
   const { action, id } = params as { action: string; id?: string };
 
   // Debug: Try to extract ID from different possible parameter names
-  const possibleId =
-    id ||
-    (params as any).id ||
-    (params as any)["id?"] || // Handle the literal "id?" parameter name
-    (params as any).slug ||
-    (params as any).projectId;
-  console.log("Possible ID values:", { id, possibleId, allParams: params });
+  const possibleId = useMemo(() => {
+    const extractedId =
+      id ||
+      (params as any).id ||
+      (params as any)["id?"] || // Handle the literal "id?" parameter name
+      (params as any).slug ||
+      (params as any).projectId;
+    // Debug log removed to prevent re-renders
+    return extractedId;
+  }, [id, params]);
 
-  // Debug: Log route parameters
-  console.log("Route params:", { action, id, params });
-  console.log("Full params object:", params);
-  console.log("User:", user);
+  // Debug: Log route parameters (removed to prevent re-renders)
 
   const [formData, setFormData] = useState<ProjectFormState>({
     slug: "",
@@ -83,30 +83,21 @@ export default function ProjectFormPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [hasLoadedData, setHasLoadedData] = useState(false);
 
   // Fetch existing project if editing
   useEffect(() => {
-    console.log("useEffect triggered with:", {
-      action,
-      id: possibleId,
-      user: !!user,
-    });
-    if (action === "edit" && possibleId && user) {
+    if (action === "edit" && possibleId && user && !hasLoadedData) {
       setLoading(true);
       setError("");
       (async () => {
         try {
-          console.log("Fetching project with ID:", possibleId);
           let project = await getProject(possibleId);
-          console.log("Direct ID fetch result:", project);
           if (!project) {
-            console.log("Trying slug-based fetch...");
             const bySlug = await getProjectBySlug(possibleId);
-            console.log("Slug-based fetch result:", bySlug);
             project = bySlug?.data || null;
           }
           if (project) {
-            console.log("Loaded project data:", project); // Debug log
             const newFormData = {
               slug: project.slug || "",
               title: project.title || "",
@@ -125,8 +116,8 @@ export default function ProjectFormPage() {
               imagePath: project.imagePath || "",
               images: project.images || [],
             };
-            console.log("Setting form data to:", newFormData); // Debug log
             setFormData(newFormData);
+            setHasLoadedData(true);
           } else {
             setError("Project not found.");
           }
@@ -139,7 +130,6 @@ export default function ProjectFormPage() {
       })();
     } else if (action === "new") {
       // Reset form for new project
-      console.log("Resetting form for new project");
       setFormData({
         slug: "",
         title: "",
@@ -160,15 +150,8 @@ export default function ProjectFormPage() {
       });
       setError("");
       setImageFile(null);
-    } else {
-      console.log("Unknown action:", action);
     }
-  }, [action, possibleId, user]);
-
-  // Debug: Monitor formData changes
-  useEffect(() => {
-    console.log("Form data changed:", formData);
-  }, [formData]);
+  }, [action, possibleId, user, hasLoadedData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -235,6 +218,11 @@ export default function ProjectFormPage() {
     e.preventDefault();
     if (!user) return;
 
+    console.log("🚀 FORM SUBMISSION STARTED");
+    console.log("📝 Form data being submitted:", formData);
+    console.log("🔧 Action:", action);
+    console.log("🆔 Possible ID:", possibleId);
+
     setLoading(true);
     setError("");
 
@@ -266,11 +254,25 @@ export default function ProjectFormPage() {
       };
 
       if (action === "new") {
-        await addProject(payload);
+        console.log("🆕 Creating new project...");
+        console.log("📦 Payload for new project:", payload);
+        const newId = await addProject(payload);
+        console.log("✅ Project created with ID:", newId);
         alert("Project created successfully!");
-      } else if (action === "edit" && id) {
-        await updateProject(id, payload);
+      } else if (action === "edit" && possibleId) {
+        console.log("✏️ Updating existing project...");
+        console.log("📦 Payload for update:", payload);
+        console.log("🆔 Updating project with ID:", possibleId);
+        await updateProject(possibleId, payload);
+        console.log("✅ Project updated successfully");
         alert("Project updated successfully!");
+      } else {
+        console.error("❌ Invalid action or missing ID for edit:", {
+          action,
+          possibleId,
+        });
+        setError("Invalid action or missing ID for edit.");
+        return;
       }
 
       router.push("/admin");
@@ -321,10 +323,6 @@ export default function ProjectFormPage() {
               required
               placeholder="my-awesome-project"
             />
-            {/* Debug: Show current value */}
-            <small style={{ color: "red" }}>
-              Debug - Current slug value: "{formData.slug}"
-            </small>
           </div>
 
           <div className="form-group">
@@ -551,12 +549,13 @@ export default function ProjectFormPage() {
                 value={stackInput}
                 onChange={(e) => setStackInput(e.target.value)}
                 placeholder="Add a tech (e.g., React, Node.js)"
-                onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  (e.preventDefault(),
-                  handleArrayAdd("stack", stackInput),
-                  setStackInput(""))
-                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleArrayAdd("stack", stackInput);
+                    setStackInput("");
+                  }
+                }}
               />
               <button
                 type="button"
