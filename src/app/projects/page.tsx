@@ -78,7 +78,7 @@ export default function ProjectsPage() {
                     style={{
                       width: "100%",
                       height: 140,
-                      objectFit: "cover",
+                      objectFit: "contain",
                       borderRadius: 12,
                     }}
                   />
@@ -87,16 +87,26 @@ export default function ProjectsPage() {
                 <div className="thumb" aria-hidden="true" />
               )}
 
-              <div className="card-header">
-                <h3>{p.data.title}</h3>
-                <span className="year">{p.data.year}</span>
-              </div>
+              <Link
+                href={`/projects/${p.data.slug}`}
+                style={{ color: "inherit" }}
+              >
+                <div className="card-header">
+                  <h3>{p.data.title}</h3>
+                  <span className="year">{p.data.year}</span>
+                </div>
+              </Link>
 
-              {p.data.summary ? (
-                <p>{p.data.summary}</p>
-              ) : p.data.description ? (
-                <p>{p.data.description}</p>
-              ) : null}
+              <Link
+                href={`/projects/${p.data.slug}`}
+                style={{ color: "inherit" }}
+              >
+                {p.data.summary ? (
+                  <p>{p.data.summary}</p>
+                ) : p.data.description ? (
+                  <p>{p.data.description}</p>
+                ) : null}
+              </Link>
 
               {p.data.tags?.length ? (
                 <div className="tags" aria-label="Tags">

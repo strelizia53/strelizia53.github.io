@@ -27,6 +27,7 @@ type ProjectFormState = {
   };
   imageUrl?: string;
   imagePath?: string;
+  images?: { src: string; alt: string }[];
 };
 
 export default function NewProjectPage() {
@@ -56,6 +57,7 @@ export default function NewProjectPage() {
   const [tagInput, setTagInput] = useState("");
   const [stackInput, setStackInput] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -113,6 +115,12 @@ export default function NewProjectPage() {
     }
   };
 
+  const handleMultiImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files).slice(0, 5);
+    setImageFiles(files);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -121,15 +129,26 @@ export default function NewProjectPage() {
     try {
       let finalImageUrl = formData.imageUrl;
       let finalImagePath = formData.imagePath;
+      let finalImages: { src: string; alt: string }[] | undefined =
+        formData.images;
       if (imageFile) {
         const { url, path } = await uploadFile(imageFile, "projects");
         finalImageUrl = url;
         finalImagePath = path;
       }
+      if (imageFiles.length) {
+        const uploaded = [] as { src: string; alt: string }[];
+        for (const f of imageFiles.slice(0, 5)) {
+          const { url } = await uploadFile(f, "projects");
+          uploaded.push({ src: url, alt: formData.title || f.name });
+        }
+        finalImages = uploaded;
+      }
       const payload = {
         ...formData,
         imageUrl: finalImageUrl,
         imagePath: finalImagePath,
+        images: finalImages,
         year: Number(formData.year),
         links: {
           demo: formData.links.demo || "",
@@ -473,6 +492,22 @@ export default function NewProjectPage() {
           />
           <p className="form-help">
             {imageFile ? `Selected: ${imageFile.name}` : "No file selected"}
+          </p>
+        </div>
+
+        <div className="form-group">
+          <label>Additional Images (up to 5)</label>
+          <input
+            className="file-input"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleMultiImageChange}
+          />
+          <p className="form-help">
+            {imageFiles.length
+              ? `${imageFiles.length} selected`
+              : "None selected"}
           </p>
         </div>
 

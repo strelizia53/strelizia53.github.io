@@ -77,7 +77,11 @@ export default function BlogPage() {
                     alt={p.data.title}
                     width={1200}
                     height={630}
-                    style={{ width: "100%", height: 180, objectFit: "cover" }}
+                    style={{
+                      width: "100%,",
+                      height: 180,
+                      objectFit: "contain",
+                    }}
                   />
                 </div>
               ) : null}

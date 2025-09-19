@@ -54,8 +54,9 @@ export type BlogDoc = {
   readingTime: string;
   createdAt?: Timestamp | null;
   updatedAt?: Timestamp | null;
-  imageUrl?: string; // 👈 ADD THIS
-  imagePath?: string; // 👈 ADD THIS
+  imageUrl?: string;
+  imagePath?: string;
+  images?: { src: string; alt: string }[];
 };
 
 const projectsCol = collection(db, "projects");
