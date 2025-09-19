@@ -161,6 +161,12 @@ export function subscribeBlogs(
 export async function addProject(
   data: Omit<ProjectDoc, "createdAt" | "updatedAt">
 ) {
+  if (!isFirebaseInitialized() || !projectsCol) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const payload = {
     ...data,
     createdAt: serverTimestamp(),
@@ -205,6 +211,12 @@ export async function removeProject(id: string, data?: ProjectDoc) {
 
 /** Add blog */
 export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
+  if (!isFirebaseInitialized() || !blogsCol) {
+    throw new Error(
+      "Firebase not initialized. Please check your environment variables."
+    );
+  }
+
   const payload = {
     ...data,
     createdAt: serverTimestamp(),
