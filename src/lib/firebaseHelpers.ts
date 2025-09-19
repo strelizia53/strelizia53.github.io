@@ -161,10 +161,7 @@ export function subscribeBlogs(
 export async function addProject(
   data: Omit<ProjectDoc, "createdAt" | "updatedAt">
 ) {
-  console.log("🔥 addProject called with data:", data);
-
   if (!isFirebaseInitialized() || !projectsCol) {
-    console.error("❌ Firebase not initialized or projectsCol is null");
     throw new Error(
       "Firebase not initialized. Please check your environment variables."
     );
@@ -181,11 +178,7 @@ export async function addProject(
     updatedAt: serverTimestamp(),
   };
 
-  console.log("🔥 addProject payload:", payload);
-  console.log("🔥 projectsCol:", projectsCol);
-
   const ref = await addDoc(projectsCol, payload);
-  console.log("✅ addProject success, new ID:", ref.id);
   return ref.id;
 }
 
@@ -194,10 +187,7 @@ export async function updateProject(
   id: string,
   data: Partial<Omit<ProjectDoc, "createdAt" | "updatedAt">>
 ) {
-  console.log("🔥 updateProject called with ID:", id, "and data:", data);
-
   if (!isFirebaseInitialized() || !db) {
-    console.error("❌ Firebase not initialized or db is null");
     throw new Error(
       "Firebase not initialized. Please check your environment variables."
     );
@@ -213,13 +203,8 @@ export async function updateProject(
     updatedAt: serverTimestamp(),
   };
 
-  console.log("🔥 updateProject payload:", payload);
-
   const ref = doc(db, "projects", id);
-  console.log("🔥 updateProject ref:", ref);
-
   await updateDoc(ref, payload as DocumentData);
-  console.log("✅ updateProject success");
 }
 
 /** Delete project */
@@ -239,10 +224,7 @@ export async function removeProject(id: string, data?: ProjectDoc) {
 
 /** Add blog */
 export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
-  console.log("🔥 addBlog called with data:", data);
-
   if (!isFirebaseInitialized() || !blogsCol) {
-    console.error("❌ Firebase not initialized or blogsCol is null");
     throw new Error(
       "Firebase not initialized. Please check your environment variables."
     );
@@ -259,11 +241,7 @@ export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
     updatedAt: serverTimestamp(),
   };
 
-  console.log("🔥 addBlog payload:", payload);
-  console.log("🔥 blogsCol:", blogsCol);
-
   const ref = await addDoc(blogsCol, payload);
-  console.log("✅ addBlog success, new ID:", ref.id);
   return ref.id;
 }
 
@@ -272,10 +250,7 @@ export async function updateBlog(
   id: string,
   data: Partial<Omit<BlogDoc, "createdAt" | "updatedAt">>
 ) {
-  console.log("🔥 updateBlog called with ID:", id, "and data:", data);
-
   if (!isFirebaseInitialized() || !db) {
-    console.error("❌ Firebase not initialized or db is null");
     throw new Error(
       "Firebase not initialized. Please check your environment variables."
     );
@@ -291,13 +266,8 @@ export async function updateBlog(
     updatedAt: serverTimestamp(),
   };
 
-  console.log("🔥 updateBlog payload:", payload);
-
   const ref = doc(db, "blogs", id);
-  console.log("🔥 updateBlog ref:", ref);
-
   await updateDoc(ref, payload as DocumentData);
-  console.log("✅ updateBlog success");
 }
 
 /** Delete blog */

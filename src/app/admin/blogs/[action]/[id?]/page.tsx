@@ -160,11 +160,6 @@ export default function BlogFormPage() {
     e.preventDefault();
     if (!user) return;
 
-    console.log("🚀 BLOG FORM SUBMISSION STARTED");
-    console.log("📝 Form data being submitted:", formData);
-    console.log("🔧 Action:", action);
-    console.log("🆔 Possible ID:", possibleId);
-
     setLoading(true);
     setError("");
 
@@ -191,23 +186,12 @@ export default function BlogFormPage() {
       };
 
       if (action === "new") {
-        console.log("🆕 Creating new blog...");
-        console.log("📦 Payload for new blog:", payload);
-        const newId = await addBlog(payload);
-        console.log("✅ Blog created with ID:", newId);
+        await addBlog(payload);
         alert("Blog post created successfully!");
       } else if (action === "edit" && possibleId) {
-        console.log("✏️ Updating existing blog...");
-        console.log("📦 Payload for update:", payload);
-        console.log("🆔 Updating blog with ID:", possibleId);
         await updateBlog(possibleId, payload);
-        console.log("✅ Blog updated successfully");
         alert("Blog post updated successfully!");
       } else {
-        console.error("❌ Invalid action or missing ID for edit:", {
-          action,
-          possibleId,
-        });
         setError("Invalid action or missing ID for edit.");
         return;
       }

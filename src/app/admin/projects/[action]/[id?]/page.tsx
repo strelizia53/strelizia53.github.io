@@ -218,11 +218,6 @@ export default function ProjectFormPage() {
     e.preventDefault();
     if (!user) return;
 
-    console.log("🚀 FORM SUBMISSION STARTED");
-    console.log("📝 Form data being submitted:", formData);
-    console.log("🔧 Action:", action);
-    console.log("🆔 Possible ID:", possibleId);
-
     setLoading(true);
     setError("");
 
@@ -254,23 +249,12 @@ export default function ProjectFormPage() {
       };
 
       if (action === "new") {
-        console.log("🆕 Creating new project...");
-        console.log("📦 Payload for new project:", payload);
-        const newId = await addProject(payload);
-        console.log("✅ Project created with ID:", newId);
+        await addProject(payload);
         alert("Project created successfully!");
       } else if (action === "edit" && possibleId) {
-        console.log("✏️ Updating existing project...");
-        console.log("📦 Payload for update:", payload);
-        console.log("🆔 Updating project with ID:", possibleId);
         await updateProject(possibleId, payload);
-        console.log("✅ Project updated successfully");
         alert("Project updated successfully!");
       } else {
-        console.error("❌ Invalid action or missing ID for edit:", {
-          action,
-          possibleId,
-        });
         setError("Invalid action or missing ID for edit.");
         return;
       }
