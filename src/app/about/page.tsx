@@ -3,17 +3,19 @@ import {
   FaReact,
   FaNodeJs,
   FaGitAlt,
-  FaDocker,
   FaDownload,
+  FaPython,
+  FaAws,
 } from "react-icons/fa";
 import {
   SiTypescript,
   SiNextdotjs,
   SiExpress,
   SiMongodb,
-  SiPostgresql,
-  SiGraphql,
-  SiTailwindcss,
+  SiFirebase,
+  SiFlask,
+  SiFlutter,
+  SiMysql,
 } from "react-icons/si";
 
 export default function AboutPage() {
@@ -25,12 +27,13 @@ export default function AboutPage() {
     { name: "Node.js", icon: <FaNodeJs size={26} /> },
     { name: "Express", icon: <SiExpress size={26} /> },
     { name: "MongoDB", icon: <SiMongodb size={26} /> },
-    { name: "PostgreSQL", icon: <SiPostgresql size={26} /> },
-    { name: "REST APIs", icon: <FaNodeJs size={26} /> },
-    { name: "GraphQL", icon: <SiGraphql size={26} /> },
+    { name: "Firebase", icon: <SiFirebase size={26} /> },
+    { name: "Python", icon: <FaPython size={26} /> },
+    { name: "Flask", icon: <SiFlask size={26} /> },
+    { name: "Flutter", icon: <SiFlutter size={26} /> },
+    { name: "MySQL", icon: <SiMysql size={26} /> },
     { name: "Git & GitHub", icon: <FaGitAlt size={26} /> },
-    { name: "Docker", icon: <FaDocker size={26} /> },
-    { name: "Tailwind CSS / CSS", icon: <SiTailwindcss size={26} /> },
+    { name: "AWS", icon: <FaAws size={26} /> },
   ];
 
   return (
