@@ -15,6 +15,21 @@ export default function ContactPage() {
   const msgId = useId();
 
   const [state, setState] = useState<FormState>({ type: "idle" });
+  const [copyState, setCopyState] = useState<"idle" | "copying" | "copied">(
+    "idle"
+  );
+
+  async function handleCopyEmail() {
+    setCopyState("copying");
+    try {
+      await navigator.clipboard.writeText("rushaidkhan53@gmail.com");
+      setCopyState("copied");
+      setTimeout(() => setCopyState("idle"), 2000);
+    } catch (err) {
+      console.error("Failed to copy email:", err);
+      setCopyState("idle");
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -89,18 +104,23 @@ export default function ContactPage() {
             <div className="contact-actions">
               <a
                 className="btn btn-primary"
-                href="mailto:you@example.com?subject=Hi%20there"
+                href="mailto:rushaidkhan53@gmail.com?subject=Hi%20there"
               >
                 Open Email
               </a>
               <button
                 className="btn btn-outline"
-                onClick={() => navigator.clipboard.writeText("you@example.com")}
+                onClick={handleCopyEmail}
                 type="button"
+                disabled={copyState === "copying"}
                 aria-label="Copy email address"
                 title="Copy email"
               >
-                Copy Address
+                {copyState === "copying"
+                  ? "Copying..."
+                  : copyState === "copied"
+                  ? "Copied!"
+                  : "Copy Address"}
               </button>
             </div>
           </div>
@@ -111,7 +131,7 @@ export default function ContactPage() {
             <div className="contact-actions">
               <Link
                 className="btn btn-outline"
-                href="https://github.com/yourusername"
+                href="https://github.com/strelizia53"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -119,7 +139,7 @@ export default function ContactPage() {
               </Link>
               <Link
                 className="btn btn-outline"
-                href="https://linkedin.com/in/yourusername"
+                href="https://linkedin.com/in/rushaid-khan"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -186,7 +206,7 @@ export default function ContactPage() {
             <p className="form-help">I usually reply within 1–2 days.</p>
           </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
+          <div className="form-actions">
             <button
               className="btn btn-primary"
               type="submit"
@@ -196,7 +216,7 @@ export default function ContactPage() {
             </button>
             <a
               className="btn btn-outline"
-              href="mailto:you@example.com?subject=Hi%20there"
+              href="mailto:rushaidkhan53@gmail.com?subject=Hi%20there"
             >
               Use Email Client
             </a>
