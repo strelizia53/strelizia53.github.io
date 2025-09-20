@@ -169,7 +169,7 @@ export async function addProject(
 
   // Filter out undefined values to avoid Firestore errors
   const cleanData = Object.fromEntries(
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   );
 
   const payload = {
@@ -195,7 +195,7 @@ export async function updateProject(
 
   // Filter out undefined values to avoid Firestore errors
   const cleanData = Object.fromEntries(
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   );
 
   const payload = {
@@ -232,7 +232,7 @@ export async function addBlog(data: Omit<BlogDoc, "createdAt" | "updatedAt">) {
 
   // Filter out undefined values to avoid Firestore errors
   const cleanData = Object.fromEntries(
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   );
 
   const payload = {
@@ -258,7 +258,7 @@ export async function updateBlog(
 
   // Filter out undefined values to avoid Firestore errors
   const cleanData = Object.fromEntries(
-    Object.entries(data).filter(([_, value]) => value !== undefined)
+    Object.entries(data).filter(([, value]) => value !== undefined)
   );
 
   const payload = {

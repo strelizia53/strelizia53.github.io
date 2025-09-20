@@ -1,7 +1,7 @@
 // src/app/admin/projects/[action]/[id?]/page.tsx
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { FiArrowLeft } from "react-icons/fi";
 import {
@@ -47,12 +47,12 @@ export default function ProjectFormPage() {
   const possibleId = useMemo(() => {
     const extractedId =
       id ||
-      (params as any).id ||
-      (params as any)["id?"] || // Handle the literal "id?" parameter name
-      (params as any).slug ||
-      (params as any).projectId;
-    // Debug log removed to prevent re-renders
-    return extractedId;
+      (params as Record<string, string | string[]>).id ||
+      (params as Record<string, string | string[]>)["id?"] || // Handle the literal "id?" parameter name
+      (params as Record<string, string | string[]>).slug ||
+      (params as Record<string, string | string[]>).projectId;
+    // Ensure we return a string, not an array
+    return Array.isArray(extractedId) ? extractedId[0] : extractedId;
   }, [id, params]);
 
   // Debug: Log route parameters (removed to prevent re-renders)
