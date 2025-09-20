@@ -1453,12 +1453,14 @@ button:focus-visible {
 .about-hero {
   text-align: center;
   margin-bottom: 40px;
+  animation: slideInUp 0.8s ease-out;
 }
 .about-hero h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 2.6rem);
   letter-spacing: -0.4px;
   position: relative;
+  animation: fadeInScale 1s ease-out 0.2s both;
 }
 .about-hero h1::after {
   content: "";
@@ -1468,12 +1470,14 @@ button:focus-visible {
   height: 3px;
   border-radius: 3px;
   background: var(--accent);
+  animation: expandWidth 0.8s ease-out 0.6s both;
 }
 .about-hero p {
   margin: 14px auto 0;
   max-width: 60ch;
   opacity: 0.85;
   line-height: 1.6;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
 .cv-button {
@@ -1485,12 +1489,34 @@ button:focus-visible {
   color: var(--accent-contrast);
   border-radius: 9999px;
   font-weight: 600;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  animation: bounceIn 0.8s ease-out 0.8s both;
+}
+.cv-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+.cv-button:hover::before {
+  left: 100%;
 }
 .cv-button:hover {
   background: var(--muted);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .skills-grid {
@@ -1498,6 +1524,7 @@ button:focus-visible {
   gap: 22px;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   margin: 30px 0;
+  animation: fadeInUp 0.8s ease-out 1s both;
 }
 .skill-card {
   background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -1505,11 +1532,77 @@ button:focus-visible {
   border-radius: var(--radius);
   padding: 22px 18px;
   text-align: center;
-  transition: transform 0.18s ease, box-shadow 0.22s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.6s ease-out both;
+}
+.skill-card:nth-child(1) {
+  animation-delay: 1.2s;
+}
+.skill-card:nth-child(2) {
+  animation-delay: 1.3s;
+}
+.skill-card:nth-child(3) {
+  animation-delay: 1.4s;
+}
+.skill-card:nth-child(4) {
+  animation-delay: 1.5s;
+}
+.skill-card:nth-child(5) {
+  animation-delay: 1.6s;
+}
+.skill-card:nth-child(6) {
+  animation-delay: 1.7s;
+}
+.skill-card:nth-child(7) {
+  animation-delay: 1.8s;
+}
+.skill-card:nth-child(8) {
+  animation-delay: 1.9s;
+}
+.skill-card:nth-child(9) {
+  animation-delay: 2s;
+}
+.skill-card:nth-child(10) {
+  animation-delay: 2.1s;
+}
+.skill-card:nth-child(11) {
+  animation-delay: 2.2s;
+}
+.skill-card:nth-child(12) {
+  animation-delay: 2.3s;
+}
+.skill-card:nth-child(13) {
+  animation-delay: 2.4s;
+}
+.skill-card:nth-child(14) {
+  animation-delay: 2.5s;
+}
+
+.skill-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 5%, transparent),
+    color-mix(in srgb, var(--muted) 8%, transparent)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: var(--radius);
+}
+.skill-card:hover::before {
+  opacity: 1;
 }
 .skill-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-card);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--fg) 15%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 90%, transparent);
 }
 .skill-icon {
   display: flex;
@@ -1520,12 +1613,92 @@ button:focus-visible {
   margin: 0 auto 12px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--accent) 20%, transparent);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+.skill-card:hover .skill-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 50%, var(--muted) 10%)
+  );
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .skill-card h3 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.3px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+.skill-card:hover h3 {
+  color: var(--accent-ink);
+  transform: translateY(-2px);
+}
+
+/* Animation keyframes */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 60px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 /* ===================== */
 /* Admin Dashboard Styles */
