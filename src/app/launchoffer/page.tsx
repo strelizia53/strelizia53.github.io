@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 export default function LaunchOfferPage() {
-  const [slots, setSlots] = useState(1); // simulate slots taken
+  const [slots, setSlots] = useState(0); // simulate slots taken
 
   return (
     <main className="launch-offer">
@@ -27,7 +27,10 @@ export default function LaunchOfferPage() {
             </span>
           </p>
 
-          <Link href="/contact" className="btn btn-primary cta-btn">
+          <Link
+            href="https://forms.gle/hY6pifQSzkfWsWMNA"
+            className="btn btn-primary cta-btn"
+          >
             Claim My Spot →
           </Link>
 
@@ -150,7 +153,10 @@ export default function LaunchOfferPage() {
       <section className="section final-cta fade-in">
         <div className="container narrow">
           <h2>⚡ 10 Spots Only — Offer Ends When Filled!</h2>
-          <Link href="/contact" className="btn btn-primary cta-btn">
+          <Link
+            href="https://forms.gle/hY6pifQSzkfWsWMNA"
+            className="btn btn-primary cta-btn"
+          >
             Reserve My Free Website →
           </Link>
           <p className="trust-line">
