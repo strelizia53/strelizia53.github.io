@@ -13,7 +13,7 @@ import {
   deleteFile,
 } from "@/lib/firebaseHelpers";
 import { useAuth } from "@/contexts/AuthContext";
-import Image from "next/image"; // ✅ Import Image
+import Image from "next/image";
 
 type ProjectFormState = {
   slug: string;
@@ -28,13 +28,29 @@ type ProjectFormState = {
   learnings?: string[];
   tags: string[];
   stack: string[];
-  links: {
-    demo: string;
-    code: string;
-  };
+  links: { demo: string; code: string };
   imageUrl?: string;
   imagePath?: string;
   images?: { src: string; alt: string }[];
+};
+
+const EMPTY_FORM: ProjectFormState = {
+  slug: "",
+  title: "",
+  year: new Date().getFullYear(),
+  category: "Full-Stack",
+  summary: "",
+  description: "",
+  problem: "",
+  solution: "",
+  highlights: [],
+  learnings: [],
+  tags: [],
+  stack: [],
+  links: { demo: "", code: "" },
+  imageUrl: "",
+  imagePath: "",
+  images: [],
 };
 
 export default function ProjectFormPage() {
@@ -43,39 +59,17 @@ export default function ProjectFormPage() {
   const params = useParams();
   const { action, id } = params as { action: string; id?: string };
 
-  // Debug: Try to extract ID from different possible parameter names
   const possibleId = useMemo(() => {
-    const extractedId =
+    const extracted =
       id ||
       (params as Record<string, string | string[]>).id ||
-      (params as Record<string, string | string[]>)["id?"] || // Handle the literal "id?" parameter name
+      (params as Record<string, string | string[]>)["id?"] ||
       (params as Record<string, string | string[]>).slug ||
       (params as Record<string, string | string[]>).projectId;
-    // Ensure we return a string, not an array
-    return Array.isArray(extractedId) ? extractedId[0] : extractedId;
+    return Array.isArray(extracted) ? extracted[0] : extracted;
   }, [id, params]);
 
-  // Debug: Log route parameters (removed to prevent re-renders)
-
-  const [formData, setFormData] = useState<ProjectFormState>({
-    slug: "",
-    title: "",
-    year: new Date().getFullYear(),
-    category: "Full-Stack",
-    summary: "",
-    description: "",
-    problem: "",
-    solution: "",
-    highlights: [],
-    learnings: [],
-    tags: [],
-    stack: [],
-    links: { demo: "", code: "" },
-    imageUrl: "",
-    imagePath: "",
-    images: [],
-  });
-
+  const [formData, setFormData] = useState<ProjectFormState>(EMPTY_FORM);
   const [highlightInput, setHighlightInput] = useState("");
   const [learningInput, setLearningInput] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -85,7 +79,6 @@ export default function ProjectFormPage() {
   const [error, setError] = useState("");
   const [hasLoadedData, setHasLoadedData] = useState(false);
 
-  // Fetch existing project if editing
   useEffect(() => {
     if (action === "edit" && possibleId && user && !hasLoadedData) {
       setLoading(true);
@@ -98,7 +91,7 @@ export default function ProjectFormPage() {
             project = bySlug?.data || null;
           }
           if (project) {
-            const newFormData = {
+            setFormData({
               slug: project.slug || "",
               title: project.title || "",
               year: project.year || new Date().getFullYear(),
@@ -115,8 +108,7 @@ export default function ProjectFormPage() {
               imageUrl: project.imageUrl || "",
               imagePath: project.imagePath || "",
               images: project.images || [],
-            };
-            setFormData(newFormData);
+            });
             setHasLoadedData(true);
           } else {
             setError("Project not found.");
@@ -129,61 +121,25 @@ export default function ProjectFormPage() {
         }
       })();
     } else if (action === "new") {
-      // Reset form for new project
-      setFormData({
-        slug: "",
-        title: "",
-        year: new Date().getFullYear(),
-        category: "Full-Stack",
-        summary: "",
-        description: "",
-        problem: "",
-        solution: "",
-        highlights: [],
-        learnings: [],
-        tags: [],
-        stack: [],
-        links: { demo: "", code: "" },
-        imageUrl: "",
-        imagePath: "",
-        images: [],
-      });
+      setFormData(EMPTY_FORM);
       setError("");
       setImageFile(null);
     }
   }, [action, possibleId, user, hasLoadedData]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-
     if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
     } else if (name === "year") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: parseInt(value) || new Date().getFullYear(),
-      }));
+      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || new Date().getFullYear() }));
     } else if (name.startsWith("links.")) {
       const linkKey = name.split(".")[1] as "demo" | "code";
-      setFormData((prev) => ({
-        ...prev,
-        links: {
-          ...prev.links,
-          [linkKey]: value,
-        },
-      }));
+      setFormData((prev) => ({ ...prev, links: { ...prev.links, [linkKey]: value } }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -192,10 +148,7 @@ export default function ProjectFormPage() {
     value: string
   ) => {
     if (!value.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      [field]: [...(prev[field] || []), value.trim()],
-    }));
+    setFormData((prev) => ({ ...prev, [field]: [...(prev[field] || []), value.trim()] }));
   };
 
   const handleArrayRemove = (
@@ -208,57 +161,36 @@ export default function ProjectFormPage() {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
     setLoading(true);
     setError("");
-
     try {
       let finalImageUrl = formData.imageUrl;
       let finalImagePath = formData.imagePath;
-
-      // Handle image upload
       if (imageFile) {
-        // Delete old image if editing
-        if (action === "edit" && formData.imagePath) {
-          await deleteFile(formData.imagePath);
-        }
+        if (action === "edit" && formData.imagePath) await deleteFile(formData.imagePath);
         const { url, path } = await uploadFile(imageFile, "projects");
         finalImageUrl = url;
         finalImagePath = path;
       }
-
       const payload = {
         ...formData,
         imageUrl: finalImageUrl,
         imagePath: finalImagePath,
         images: formData.images || [],
         year: Number(formData.year),
-        links: {
-          demo: formData.links.demo || "",
-          code: formData.links.code || "",
-        },
+        links: { demo: formData.links.demo || "", code: formData.links.code || "" },
       };
-
       if (action === "new") {
         await addProject(payload);
-        alert("Project created successfully!");
       } else if (action === "edit" && possibleId) {
         await updateProject(possibleId, payload);
-        alert("Project updated successfully!");
       } else {
-        setError("Invalid action or missing ID for edit.");
+        setError("Invalid action or missing ID.");
         return;
       }
-
       router.push("/admin");
     } catch (err) {
       console.error("Error saving project:", err);
@@ -269,15 +201,13 @@ export default function ProjectFormPage() {
   };
 
   if (!user) {
-    return (
-      <div className="p-6">You must be logged in to access this page.</div>
-    );
+    return <div className="no-items">You must be logged in to access this page.</div>;
   }
 
   if (loading && action === "edit") {
     return (
-      <div className="p-6 flex items-center justify-center">
-        <div className="loading-spinner"></div>
+      <div className="loading-container">
+        <div className="loading-spinner" />
       </div>
     );
   }
@@ -286,18 +216,18 @@ export default function ProjectFormPage() {
     <section className="admin-form-container fade-in">
       <div className="admin-form-header">
         <button onClick={() => router.back()} className="back-button">
-          <FiArrowLeft /> Back to Admin
+          <FiArrowLeft size={16} /> Back to Admin
         </button>
-
         <h1>{action === "new" ? "Create New Project" : "Edit Project"}</h1>
       </div>
 
       {error && <div className="status error">{error}</div>}
 
       <form onSubmit={handleSubmit} className="admin-form">
+        {/* Basic info */}
         <div className="form-grid">
           <div className="form-group">
-            <label htmlFor="slug">Slug (URL-friendly ID) *</label>
+            <label htmlFor="slug">Slug *</label>
             <input
               type="text"
               id="slug"
@@ -308,7 +238,6 @@ export default function ProjectFormPage() {
               placeholder="my-awesome-project"
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="title">Title *</label>
             <input
@@ -320,7 +249,6 @@ export default function ProjectFormPage() {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="year">Year *</label>
             <input
@@ -334,7 +262,6 @@ export default function ProjectFormPage() {
               max={new Date().getFullYear() + 1}
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="category">Category *</label>
             <select
@@ -385,7 +312,6 @@ export default function ProjectFormPage() {
               rows={3}
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="solution">Solution</label>
             <textarea
@@ -398,6 +324,7 @@ export default function ProjectFormPage() {
           </div>
         </div>
 
+        {/* Highlights */}
         <div className="form-group">
           <label>Highlights</label>
           <div className="input-with-button">
@@ -406,40 +333,33 @@ export default function ProjectFormPage() {
               value={highlightInput}
               onChange={(e) => setHighlightInput(e.target.value)}
               placeholder="Add a highlight"
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (e.preventDefault(),
-                handleArrayAdd("highlights", highlightInput),
-                setHighlightInput(""))
-              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleArrayAdd("highlights", highlightInput);
+                  setHighlightInput("");
+                }
+              }}
             />
             <button
               type="button"
               className="add-item-button"
-              onClick={() => {
-                handleArrayAdd("highlights", highlightInput);
-                setHighlightInput("");
-              }}
+              onClick={() => { handleArrayAdd("highlights", highlightInput); setHighlightInput(""); }}
             >
               Add
             </button>
           </div>
           <div className="item-list">
             {formData.highlights?.map((item, idx) => (
-              <span key={idx} className="highlight-item">
+              <span key={idx} className="item-tag">
                 {item}
-                <button
-                  type="button"
-                  className="remove-item"
-                  onClick={() => handleArrayRemove("highlights", idx)}
-                >
-                  ×
-                </button>
+                <button type="button" className="remove-item" onClick={() => handleArrayRemove("highlights", idx)}>×</button>
               </span>
             ))}
           </div>
         </div>
 
+        {/* Key Learnings */}
         <div className="form-group">
           <label>Key Learnings</label>
           <div className="input-with-button">
@@ -448,40 +368,33 @@ export default function ProjectFormPage() {
               value={learningInput}
               onChange={(e) => setLearningInput(e.target.value)}
               placeholder="Add a learning"
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (e.preventDefault(),
-                handleArrayAdd("learnings", learningInput),
-                setLearningInput(""))
-              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleArrayAdd("learnings", learningInput);
+                  setLearningInput("");
+                }
+              }}
             />
             <button
               type="button"
               className="add-item-button"
-              onClick={() => {
-                handleArrayAdd("learnings", learningInput);
-                setLearningInput("");
-              }}
+              onClick={() => { handleArrayAdd("learnings", learningInput); setLearningInput(""); }}
             >
               Add
             </button>
           </div>
           <div className="item-list">
             {formData.learnings?.map((item, idx) => (
-              <span key={idx} className="highlight-item">
+              <span key={idx} className="item-tag">
                 {item}
-                <button
-                  type="button"
-                  className="remove-item"
-                  onClick={() => handleArrayRemove("learnings", idx)}
-                >
-                  ×
-                </button>
+                <button type="button" className="remove-item" onClick={() => handleArrayRemove("learnings", idx)}>×</button>
               </span>
             ))}
           </div>
         </div>
 
+        {/* Tags & Stack */}
         <div className="form-grid">
           <div className="form-group">
             <label>Tags</label>
@@ -491,35 +404,17 @@ export default function ProjectFormPage() {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 placeholder="Add a tag"
-                onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  (e.preventDefault(),
-                  handleArrayAdd("tags", tagInput),
-                  setTagInput(""))
-                }
-              />
-              <button
-                type="button"
-                className="add-item-button"
-                onClick={() => {
-                  handleArrayAdd("tags", tagInput);
-                  setTagInput("");
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); handleArrayAdd("tags", tagInput); setTagInput(""); }
                 }}
-              >
-                Add
-              </button>
+              />
+              <button type="button" className="add-item-button" onClick={() => { handleArrayAdd("tags", tagInput); setTagInput(""); }}>Add</button>
             </div>
             <div className="item-list">
               {formData.tags.map((tag, idx) => (
                 <span key={idx} className="item-tag">
                   {tag}
-                  <button
-                    type="button"
-                    className="remove-item"
-                    onClick={() => handleArrayRemove("tags", idx)}
-                  >
-                    ×
-                  </button>
+                  <button type="button" className="remove-item" onClick={() => handleArrayRemove("tags", idx)}>×</button>
                 </span>
               ))}
             </div>
@@ -532,43 +427,25 @@ export default function ProjectFormPage() {
                 type="text"
                 value={stackInput}
                 onChange={(e) => setStackInput(e.target.value)}
-                placeholder="Add a tech (e.g., React, Node.js)"
+                placeholder="e.g. React, Node.js"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleArrayAdd("stack", stackInput);
-                    setStackInput("");
-                  }
+                  if (e.key === "Enter") { e.preventDefault(); handleArrayAdd("stack", stackInput); setStackInput(""); }
                 }}
               />
-              <button
-                type="button"
-                className="add-item-button"
-                onClick={() => {
-                  handleArrayAdd("stack", stackInput);
-                  setStackInput("");
-                }}
-              >
-                Add
-              </button>
+              <button type="button" className="add-item-button" onClick={() => { handleArrayAdd("stack", stackInput); setStackInput(""); }}>Add</button>
             </div>
             <div className="item-list">
               {formData.stack.map((tech, idx) => (
-                <span key={idx} className="item-chip">
+                <span key={idx} className="item-tag">
                   {tech}
-                  <button
-                    type="button"
-                    className="remove-item"
-                    onClick={() => handleArrayRemove("stack", idx)}
-                  >
-                    ×
-                  </button>
+                  <button type="button" className="remove-item" onClick={() => handleArrayRemove("stack", idx)}>×</button>
                 </span>
               ))}
             </div>
           </div>
         </div>
 
+        {/* Links */}
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="links.demo">Live Demo URL</label>
@@ -594,16 +471,17 @@ export default function ProjectFormPage() {
           </div>
         </div>
 
+        {/* Image */}
         <div className="form-group">
           <label>Featured Image</label>
           {formData.imageUrl && (
-            <div className="mb-4">
+            <div className="image-preview" style={{ marginBottom: "var(--space-md)" }}>
               <Image
                 src={formData.imageUrl}
                 alt="Current featured image"
-                width={300}
-                height={128}
-                className="h-32 w-auto object-cover rounded"
+                width={600}
+                height={200}
+                style={{ width: "100%", height: 180, objectFit: "cover" }}
                 unoptimized
               />
             </div>
@@ -611,7 +489,7 @@ export default function ProjectFormPage() {
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(e) => e.target.files?.[0] && setImageFile(e.target.files[0])}
             className="file-input"
           />
           <p className="form-help">
@@ -621,11 +499,10 @@ export default function ProjectFormPage() {
 
         <div className="form-actions">
           <button type="submit" disabled={loading} className="submit-button">
-            {loading
-              ? "Saving..."
-              : action === "new"
-              ? "Create Project"
-              : "Update Project"}
+            {loading ? "Saving…" : action === "new" ? "Create Project" : "Save Changes"}
+          </button>
+          <button type="button" onClick={() => router.push("/admin")} className="cancel-button">
+            Cancel
           </button>
         </div>
       </form>

@@ -33,10 +33,10 @@ export default function ProjectsPage() {
 
   return (
     <section className="fade-in">
-      <header className="container" style={{ paddingBlock: "8px 0" }}>
+      <header style={{ paddingBlock: "8px 0" }}>
         <h1 className="page-title">Projects</h1>
         <p className="page-intro">
-          A selection of things I&apos;ve built—spanning full-stack apps, APIs,
+          A selection of things I&apos;ve built — spanning full-stack apps, APIs,
           and frontend experiments. Each project links to the source code, and
           most have a live demo.
         </p>
@@ -56,20 +56,18 @@ export default function ProjectsPage() {
         </div>
       </header>
 
-      <div className="projects-grid">
-        {loading ? (
-          <div className="container">Loading...</div>
-        ) : items.length === 0 ? (
-          <div className="container no-items">No projects found.</div>
-        ) : (
-          items.map((p) => (
+      {loading ? (
+        <div className="loading-container">
+          <div className="loading-spinner" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="no-items">No projects found.</div>
+      ) : (
+        <div className="projects-grid">
+          {items.map((p) => (
             <article key={p.id} className="card">
               {p.data.imageUrl ? (
-                <div
-                  className="thumb"
-                  aria-hidden="true"
-                  style={{ padding: 0 }}
-                >
+                <div className="thumb" aria-hidden="true" style={{ padding: 0 }}>
                   <Image
                     src={p.data.imageUrl}
                     alt={p.data.title}
@@ -77,8 +75,8 @@ export default function ProjectsPage() {
                     height={630}
                     style={{
                       width: "100%",
-                      height: 140,
-                      objectFit: "contain",
+                      height: "100%",
+                      objectFit: "cover",
                       borderRadius: 12,
                     }}
                   />
@@ -87,20 +85,14 @@ export default function ProjectsPage() {
                 <div className="thumb" aria-hidden="true" />
               )}
 
-              <Link
-                href={`/projects/${p.data.slug}`}
-                style={{ color: "inherit" }}
-              >
+              <Link href={`/projects/${p.data.slug}`} style={{ color: "inherit" }}>
                 <div className="card-header">
                   <h3>{p.data.title}</h3>
                   <span className="year">{p.data.year}</span>
                 </div>
               </Link>
 
-              <Link
-                href={`/projects/${p.data.slug}`}
-                style={{ color: "inherit" }}
-              >
+              <Link href={`/projects/${p.data.slug}`} style={{ color: "inherit" }}>
                 {p.data.summary ? (
                   <p>{p.data.summary}</p>
                 ) : p.data.description ? (
@@ -149,11 +141,14 @@ export default function ProjectsPage() {
                     Source Code
                   </Link>
                 ) : null}
+                <Link className="link" href={`/projects/${p.data.slug}`}>
+                  Details →
+                </Link>
               </div>
             </article>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

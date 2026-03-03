@@ -41,11 +41,11 @@ export default function BlogPage() {
         <p>Short write-ups on things I build and learn along the way.</p>
       </div>
 
-      <div className="blog-toolbar" role="toolbar" aria-label="Filter posts">
+      <div className="toolbar" role="toolbar" aria-label="Filter posts">
         {allTags.map((t) => (
           <button
             key={t}
-            className="blog-pill"
+            className="pill"
             aria-pressed={tag === t}
             onClick={() => setTag(t)}
             type="button"
@@ -55,64 +55,69 @@ export default function BlogPage() {
         ))}
       </div>
 
-      <div className="blog-grid">
+      <div className="blog-list">
         {loading ? (
-          <div>Loading...</div>
+          <div className="loading-container">
+            <div className="loading-spinner" />
+          </div>
         ) : items.length === 0 ? (
           <div className="no-items">No posts found.</div>
         ) : (
           items.map((p) => (
-            <article key={p.id} className="post-card">
+            <article key={p.id} className="blog-item">
               {p.data.imageUrl ? (
-                <div
-                  style={{
-                    borderRadius: 12,
-                    overflow: "hidden",
-                    border:
-                      "1px solid color-mix(in srgb, var(--fg) 14%, transparent)",
-                  }}
-                >
+                <div className="thumb" style={{ padding: 0 }}>
                   <Image
                     src={p.data.imageUrl}
                     alt={p.data.title}
                     width={1200}
                     height={630}
                     style={{
-                      width: "100%,",
-                      height: 180,
-                      objectFit: "contain",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: 12,
                     }}
                   />
                 </div>
               ) : null}
+
               <header>
-                <h2 className="post-title">
-                  <Link href={`/blog/${p.data.slug}`}>{p.data.title}</Link>
+                <h2 className="blog-title">
+                  <Link href={`/blog/${p.data.slug}`} style={{ color: "inherit" }}>
+                    {p.data.title}
+                  </Link>
                 </h2>
-                <div className="post-meta">
-                  <span>{new Date(p.data.date).toLocaleDateString()}</span>
-                  <span>•</span>
+                <div className="blog-meta">
+                  <span>
+                    {new Date(p.data.date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                  <span>·</span>
                   <span>{p.data.readingTime}</span>
                 </div>
               </header>
 
               {p.data.summary ? (
-                <p className="post-excerpt">{p.data.summary}</p>
+                <p className="blog-summary">{p.data.summary}</p>
               ) : null}
 
               {(p.data.tags || []).length ? (
-                <div className="post-tags" aria-label="Tags">
+                <div className="tags" aria-label="Tags">
                   {p.data.tags!.map((t) => (
-                    <span key={t} className="post-tag">
+                    <span key={t} className="tag">
                       {t}
                     </span>
                   ))}
                 </div>
               ) : null}
 
-              <div className="post-actions">
-                <Link className="read-link" href={`/blog/${p.data.slug}`}>
-                  Continue Reading
+              <div className="card-actions">
+                <Link className="link primary" href={`/blog/${p.data.slug}`}>
+                  Read Post &rarr;
                 </Link>
               </div>
             </article>

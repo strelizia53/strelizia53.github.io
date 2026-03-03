@@ -13,7 +13,7 @@ import {
   getBlogBySlug,
 } from "@/lib/firebaseHelpers";
 import { useAuth } from "@/contexts/AuthContext";
-import Image from "next/image"; // ✅ Import Image
+import Image from "next/image";
 
 type BlogFormState = {
   slug: string;
@@ -28,48 +28,44 @@ type BlogFormState = {
   images?: { src: string; alt: string }[];
 };
 
+const today = new Date().toISOString().split("T")[0];
+
+const EMPTY_FORM: BlogFormState = {
+  slug: "",
+  title: "",
+  summary: "",
+  content: "",
+  date: today,
+  tags: [],
+  readingTime: "5 min read",
+  imageUrl: "",
+  imagePath: "",
+  images: [],
+};
+
 export default function BlogFormPage() {
   const { user } = useAuth();
   const router = useRouter();
   const params = useParams();
   const { action, id } = params as { action: string; id?: string };
 
-  // Debug: Try to extract ID from different possible parameter names
   const possibleId = useMemo(() => {
-    const extractedId =
+    const extracted =
       id ||
       (params as Record<string, string | string[]>).id ||
-      (params as Record<string, string | string[]>)["id?"] || // Handle the literal "id?" parameter name
+      (params as Record<string, string | string[]>)["id?"] ||
       (params as Record<string, string | string[]>).slug ||
       (params as Record<string, string | string[]>).blogId;
-    // Ensure we return a string, not an array
-    return Array.isArray(extractedId) ? extractedId[0] : extractedId;
+    return Array.isArray(extracted) ? extracted[0] : extracted;
   }, [id, params]);
 
-  // Debug logs removed to prevent re-renders
-
-  const today = new Date().toISOString().split("T")[0];
-
-  const [formData, setFormData] = useState<BlogFormState>({
-    slug: "",
-    title: "",
-    summary: "",
-    content: "",
-    date: today,
-    tags: [],
-    readingTime: "5 min read",
-    imageUrl: "",
-    imagePath: "",
-    images: [],
-  });
-
+  const [formData, setFormData] = useState<BlogFormState>(EMPTY_FORM);
   const [tagInput, setTagInput] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasLoadedData, setHasLoadedData] = useState(false);
 
-  // Fetch existing blog if editing
   useEffect(() => {
     if (action === "edit" && possibleId && user && !hasLoadedData) {
       setLoading(true);
@@ -82,7 +78,7 @@ export default function BlogFormPage() {
             blog = bySlug?.data || null;
           }
           if (blog) {
-            const newFormData = {
+            setFormData({
               slug: blog.slug || "",
               title: blog.title || "",
               summary: blog.summary || "",
@@ -93,8 +89,7 @@ export default function BlogFormPage() {
               imageUrl: blog.imageUrl || "",
               imagePath: blog.imagePath || "",
               images: blog.images || [],
-            };
-            setFormData(newFormData);
+            });
             setHasLoadedData(true);
           } else {
             setError("Blog post not found.");
@@ -107,95 +102,47 @@ export default function BlogFormPage() {
         }
       })();
     } else if (action === "new") {
-      // Reset form for new blog
-      setFormData({
-        slug: "",
-        title: "",
-        summary: "",
-        content: "",
-        date: today,
-        tags: [],
-        readingTime: "5 min read",
-        imageUrl: "",
-        imagePath: "",
-        images: [],
-      });
+      setFormData(EMPTY_FORM);
       setError("");
       setImageFile(null);
     }
-  }, [action, possibleId, user, today, hasLoadedData]);
+  }, [action, possibleId, user, hasLoadedData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleArrayAdd = (field: "tags", value: string) => {
-    if (!value.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      [field]: [...(prev[field] || []), value.trim()],
-    }));
-  };
-
-  const handleArrayRemove = (field: "tags", index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: (prev[field] || []).filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
     setLoading(true);
     setError("");
-
     try {
       let finalImageUrl = formData.imageUrl;
       let finalImagePath = formData.imagePath;
-
-      // Handle image upload
       if (imageFile) {
-        // Delete old image if editing
-        if (action === "edit" && formData.imagePath) {
-          await deleteFile(formData.imagePath);
-        }
+        if (action === "edit" && formData.imagePath) await deleteFile(formData.imagePath);
         const { url, path } = await uploadFile(imageFile, "blogs");
         finalImageUrl = url;
         finalImagePath = path;
       }
-
       const payload = {
         ...formData,
         imageUrl: finalImageUrl,
         imagePath: finalImagePath,
         images: formData.images || [],
       };
-
       if (action === "new") {
         await addBlog(payload);
-        alert("Blog post created successfully!");
       } else if (action === "edit" && possibleId) {
         await updateBlog(possibleId, payload);
-        alert("Blog post updated successfully!");
       } else {
-        setError("Invalid action or missing ID for edit.");
+        setError("Invalid action or missing ID.");
         return;
       }
-
       router.push("/admin");
     } catch (err) {
       console.error("Error saving blog:", err);
@@ -206,16 +153,14 @@ export default function BlogFormPage() {
   };
 
   if (!user) {
-    return (
-      <div className="p-6">You must be logged in to access this page.</div>
-    );
+    return <div className="no-items">You must be logged in to access this page.</div>;
   }
 
   if (loading && action === "edit") {
     return (
-      <section className="loading-container">
-        <div className="loading-spinner"></div>
-      </section>
+      <div className="loading-container">
+        <div className="loading-spinner" />
+      </div>
     );
   }
 
@@ -223,7 +168,7 @@ export default function BlogFormPage() {
     <section className="admin-form-container fade-in">
       <div className="admin-form-header">
         <button onClick={() => router.back()} className="back-button">
-          <FiArrowLeft /> Back to Admin
+          <FiArrowLeft size={16} /> Back to Admin
         </button>
         <h1>{action === "new" ? "Create New Blog Post" : "Edit Blog Post"}</h1>
       </div>
@@ -231,9 +176,10 @@ export default function BlogFormPage() {
       {error && <div className="status error">{error}</div>}
 
       <form onSubmit={handleSubmit} className="admin-form">
+        {/* Basic info */}
         <div className="form-grid">
           <div className="form-group">
-            <label htmlFor="slug">Slug (URL-friendly ID) *</label>
+            <label htmlFor="slug">Slug *</label>
             <input
               type="text"
               id="slug"
@@ -243,12 +189,7 @@ export default function BlogFormPage() {
               required
               placeholder="my-awesome-blog-post"
             />
-            {/* Debug: Show current value */}
-            <small style={{ color: "red" }}>
-              Debug - Current slug value: &quot;{formData.slug}&quot;
-            </small>
           </div>
-
           <div className="form-group">
             <label htmlFor="title">Title *</label>
             <input
@@ -260,7 +201,6 @@ export default function BlogFormPage() {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="date">Publish Date *</label>
             <input
@@ -272,7 +212,6 @@ export default function BlogFormPage() {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="readingTime">Reading Time *</label>
             <input
@@ -307,11 +246,12 @@ export default function BlogFormPage() {
             value={formData.content}
             onChange={handleInputChange}
             required
-            rows={12}
+            rows={16}
             className="content-textarea"
           />
         </div>
 
+        {/* Tags */}
         <div className="form-group">
           <label>Tags</label>
           <div className="input-with-button">
@@ -320,18 +260,21 @@ export default function BlogFormPage() {
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               placeholder="Add a tag"
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                (e.preventDefault(),
-                handleArrayAdd("tags", tagInput),
-                setTagInput(""))
-              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (!tagInput.trim()) return;
+                  setFormData((prev) => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
+                  setTagInput("");
+                }
+              }}
             />
             <button
               type="button"
               className="add-item-button"
               onClick={() => {
-                handleArrayAdd("tags", tagInput);
+                if (!tagInput.trim()) return;
+                setFormData((prev) => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
                 setTagInput("");
               }}
             >
@@ -345,7 +288,12 @@ export default function BlogFormPage() {
                 <button
                   type="button"
                   className="remove-item"
-                  onClick={() => handleArrayRemove("tags", idx)}
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tags: prev.tags.filter((_, i) => i !== idx),
+                    }))
+                  }
                 >
                   ×
                 </button>
@@ -354,23 +302,24 @@ export default function BlogFormPage() {
           </div>
         </div>
 
+        {/* Image */}
         <div className="form-group">
           <label>Featured Image</label>
           {formData.imageUrl && (
-            <div className="image-preview" style={{ marginBottom: 8 }}>
+            <div className="image-preview" style={{ marginBottom: "var(--space-md)" }}>
               <Image
                 src={formData.imageUrl}
                 alt="Current featured image"
                 width={600}
                 height={240}
-                style={{ width: "100%", height: 160, objectFit: "cover" }}
+                style={{ width: "100%", height: 180, objectFit: "cover" }}
               />
             </div>
           )}
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(e) => e.target.files?.[0] && setImageFile(e.target.files[0])}
             className="file-input"
           />
           <p className="form-help">
@@ -380,17 +329,9 @@ export default function BlogFormPage() {
 
         <div className="form-actions">
           <button type="submit" disabled={loading} className="submit-button">
-            {loading
-              ? "Saving..."
-              : action === "new"
-              ? "Create Blog Post"
-              : "Update Blog Post"}
+            {loading ? "Saving…" : action === "new" ? "Create Post" : "Save Changes"}
           </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin")}
-            className="cancel-button"
-          >
+          <button type="button" onClick={() => router.push("/admin")} className="cancel-button">
             Cancel
           </button>
         </div>

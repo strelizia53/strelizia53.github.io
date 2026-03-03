@@ -11,8 +11,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Portfolio",
-  description: "Personal portfolio of a full stack developer",
+  title: {
+    default: "Rushaid Khan — Full-Stack Developer",
+    template: "%s | Rushaid Khan",
+  },
+  description:
+    "Full-stack developer building modern web applications with React, Next.js, Node.js, and Firebase.",
 };
 
 export default function RootLayout({

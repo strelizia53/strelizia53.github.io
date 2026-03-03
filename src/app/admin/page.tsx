@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FiPlus, FiEdit, FiTrash, FiLogOut } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiLogOut, FiFolder, FiFileText } from "react-icons/fi";
 import {
   subscribeProjects,
   subscribeBlogs,
@@ -28,22 +28,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!user) return;
-
-    // Subscribe to real-time updates for projects
-    const unsubscribeProjects = subscribeProjects((items) => {
-      setProjects(items);
-    });
-
-    // Subscribe to real-time updates for blogs
-    const unsubscribeBlogs = subscribeBlogs((items) => {
-      setBlogs(items);
-    });
-
-    // Cleanup subscriptions on unmount
-    return () => {
-      unsubscribeProjects();
-      unsubscribeBlogs();
-    };
+    const unsubProjects = subscribeProjects((items) => setProjects(items));
+    const unsubBlogs = subscribeBlogs((items) => setBlogs(items));
+    return () => { unsubProjects(); unsubBlogs(); };
   }, [user]);
 
   const handleLogout = async () => {
@@ -56,168 +43,213 @@ export default function AdminPage() {
   };
 
   const handleDeleteProject = async (id: string, data: ProjectDoc) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      try {
-        await removeProject(id, data);
-      } catch (error) {
-        console.error("Error deleting project:", error);
-        alert("Failed to delete project");
-      }
+    if (!confirm(`Delete "${data.title}"? This cannot be undone.`)) return;
+    try {
+      await removeProject(id, data);
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      alert("Failed to delete project");
     }
   };
 
-  const handleDeleteBlog = async (id: string) => {
-    if (confirm("Are you sure you want to delete this blog post?")) {
-      try {
-        await removeBlog(id);
-      } catch (error) {
-        console.error("Error deleting blog:", error);
-        alert("Failed to delete blog post");
-      }
+  const handleDeleteBlog = async (id: string, title: string) => {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    try {
+      await removeBlog(id);
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      alert("Failed to delete blog post");
     }
   };
 
-  // Show loading state
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner"></div>
+        <div className="loading-spinner" />
       </div>
     );
   }
 
-  // Show login form if not authenticated
-  if (!user) {
-    return <Login />;
-  }
+  if (!user) return <Login />;
 
-  // Show admin content if authenticated
   return (
-    <section className="admin-container fade-in">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
-        <button onClick={handleLogout} className="logout-button">
-          <FiLogOut /> Logout
+    <section className="fade-in" style={{ maxWidth: 900, margin: "0 auto" }}>
+      {/* Dashboard header */}
+      <div className="admin-dash-header">
+        <div>
+          <h1 className="admin-dash-title">Dashboard</h1>
+          <p className="admin-dash-subtitle">Manage your portfolio content</p>
+        </div>
+        <button onClick={handleLogout} className="btn btn-outline admin-logout-btn">
+          <FiLogOut size={16} />
+          Sign out
         </button>
+      </div>
+
+      {/* Stats row */}
+      <div className="admin-stats">
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon">
+            <FiFolder size={20} />
+          </div>
+          <div>
+            <p className="admin-stat-value">{projects.length}</p>
+            <p className="admin-stat-label">Projects</p>
+          </div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon">
+            <FiFileText size={20} />
+          </div>
+          <div>
+            <p className="admin-stat-value">{blogs.length}</p>
+            <p className="admin-stat-label">Blog Posts</p>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="admin-tabs">
+      <div className="toolbar" role="tablist" aria-label="Content type">
         <button
+          role="tab"
+          className="pill"
+          aria-pressed={activeTab === "projects"}
           onClick={() => setActiveTab("projects")}
-          className={activeTab === "projects" ? "tab-active" : "tab-inactive"}
         >
+          <FiFolder size={14} />
           Projects
         </button>
         <button
+          role="tab"
+          className="pill"
+          aria-pressed={activeTab === "blogs"}
           onClick={() => setActiveTab("blogs")}
-          className={activeTab === "blogs" ? "tab-active" : "tab-inactive"}
         >
-          Blogs
+          <FiFileText size={14} />
+          Blog Posts
         </button>
       </div>
 
-      {/* Content */}
+      {/* Projects panel */}
       {activeTab === "projects" && (
         <div className="admin-section">
-          <div className="section-header">
-            <h2>Manage Projects</h2>
-            <Link href="/admin/projects/new" className="add-button">
-              <FiPlus /> Add Project
+          <div className="admin-actions">
+            <Link href="/admin/projects/new/new" className="btn btn-primary">
+              <FiPlus size={16} />
+              New Project
             </Link>
           </div>
 
           {projects.length === 0 ? (
-            <p className="no-items">No projects found.</p>
+            <div className="no-items">No projects yet. Add your first one!</div>
           ) : (
-            <ul className="items-list">
+            <div className="admin-list">
               {projects.map((p) => (
-                <li key={p.id} className="item-card">
-                  <div className="item-content">
-                    <h3>{p.data.title}</h3>
-                    <p className="item-description">
-                      {p.data.description?.substring(0, 100)}
-                      {p.data.description && p.data.description.length > 100
-                        ? "..."
-                        : ""}
-                    </p>
-                    <div className="item-tags">
-                      {p.data.tags?.map((tag) => (
-                        <span key={tag} className="tag">
-                          {tag}
-                        </span>
-                      ))}
+                <div key={p.id} className="admin-item">
+                  <div className="admin-item-info">
+                    <p className="admin-item-title">{p.data.title}</p>
+                    <div className="admin-item-meta">
+                      <span>{p.data.year}</span>
+                      {p.data.category && (
+                        <>
+                          <span>·</span>
+                          <span>{p.data.category}</span>
+                        </>
+                      )}
+                      {p.data.tags?.length ? (
+                        <>
+                          <span>·</span>
+                          <span>{p.data.tags.slice(0, 3).join(", ")}</span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
-                  <div className="item-actions">
+                  <div className="admin-item-actions">
                     <Link
                       href={`/admin/projects/edit/${p.id}`}
-                      className="edit-button"
+                      className="admin-icon-btn admin-icon-btn--edit"
+                      aria-label={`Edit ${p.data.title}`}
+                      title="Edit"
                     >
-                      <FiEdit size={18} />
+                      <FiEdit2 size={15} />
                     </Link>
                     <button
-                      className="delete-button"
+                      className="admin-icon-btn admin-icon-btn--delete"
                       onClick={() => handleDeleteProject(p.id, p.data)}
+                      aria-label={`Delete ${p.data.title}`}
+                      title="Delete"
                     >
-                      <FiTrash size={18} />
+                      <FiTrash2 size={15} />
                     </button>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       )}
 
+      {/* Blogs panel */}
       {activeTab === "blogs" && (
         <div className="admin-section">
-          <div className="section-header">
-            <h2>Manage Blogs</h2>
-            <Link href="/admin/blogs/new" className="add-button">
-              <FiPlus /> Add Blog
+          <div className="admin-actions">
+            <Link href="/admin/blogs/new/new" className="btn btn-primary">
+              <FiPlus size={16} />
+              New Post
             </Link>
           </div>
 
           {blogs.length === 0 ? (
-            <p className="no-items">No blog posts found.</p>
+            <div className="no-items">No blog posts yet. Write your first one!</div>
           ) : (
-            <ul className="items-list">
+            <div className="admin-list">
               {blogs.map((b) => (
-                <li key={b.id} className="item-card">
-                  <div className="item-content">
-                    <h3>{b.data.title}</h3>
-                    <p className="item-description">
-                      {b.data.summary?.substring(0, 100)}
-                      {b.data.summary && b.data.summary.length > 100
-                        ? "..."
-                        : ""}
-                    </p>
-                    <div className="item-tags">
-                      {b.data.tags?.map((tag) => (
-                        <span key={tag} className="tag">
-                          {tag}
-                        </span>
-                      ))}
+                <div key={b.id} className="admin-item">
+                  <div className="admin-item-info">
+                    <p className="admin-item-title">{b.data.title}</p>
+                    <div className="admin-item-meta">
+                      <span>
+                        {new Date(b.data.date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      {b.data.readingTime && (
+                        <>
+                          <span>·</span>
+                          <span>{b.data.readingTime}</span>
+                        </>
+                      )}
+                      {b.data.tags?.length ? (
+                        <>
+                          <span>·</span>
+                          <span>{b.data.tags.slice(0, 3).join(", ")}</span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
-                  <div className="item-actions">
+                  <div className="admin-item-actions">
                     <Link
                       href={`/admin/blogs/edit/${b.id}`}
-                      className="edit-button"
+                      className="admin-icon-btn admin-icon-btn--edit"
+                      aria-label={`Edit ${b.data.title}`}
+                      title="Edit"
                     >
-                      <FiEdit size={18} />
+                      <FiEdit2 size={15} />
                     </Link>
                     <button
-                      className="delete-button"
-                      onClick={() => handleDeleteBlog(b.id)}
+                      className="admin-icon-btn admin-icon-btn--delete"
+                      onClick={() => handleDeleteBlog(b.id, b.data.title)}
+                      aria-label={`Delete ${b.data.title}`}
+                      title="Delete"
                     >
-                      <FiTrash size={18} />
+                      <FiTrash2 size={15} />
                     </button>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       )}

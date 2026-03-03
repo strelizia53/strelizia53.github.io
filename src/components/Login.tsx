@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { FiLock, FiMail } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
@@ -15,60 +16,73 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login(email, password);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message || "Failed to log in");
-      } else {
-        setError("Failed to log in");
-      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to sign in");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-form">
-        <div className="login-header">
-          <h2>Admin Login</h2>
-          <p>Access your portfolio admin panel</p>
+    <div className="login-wrapper">
+      <div className="login-card">
+        <div className="login-card-icon">
+          <FiLock size={24} />
         </div>
-        <form className="login-form-content" onSubmit={handleSubmit}>
-          {error && <div className="login-error">{error}</div>}
+        <h1 className="login-title">Admin Access</h1>
+        <p className="login-subtitle">Sign in to manage your portfolio</p>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          {error && (
+            <div className="status error" role="alert">
+              {error}
+            </div>
+          )}
+
           <div className="form-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">
+              <FiMail size={14} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
+              Email address
+            </label>
             <input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
               required
-              placeholder="Email address"
+              placeholder="admin@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              <FiLock size={14} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
+              Password
+            </label>
             <input
               id="password"
               name="password"
               type="password"
               autoComplete="current-password"
               required
-              placeholder="Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <div className="form-actions">
-            <button type="submit" disabled={loading} className="login-button">
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="submit-button"
+            style={{ width: "100%", marginTop: "var(--space-sm)" }}
+          >
+            {loading ? "Signing in…" : "Sign in"}
+          </button>
         </form>
       </div>
     </div>
