@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { FiMail } from "react-icons/fi";
+import { FiMail, FiArrowUpRight } from "react-icons/fi";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -9,21 +9,30 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer-inner">
         <div className="footer-brand">
-          <Link href="/" className="brand">
-            Strelizia53
+          <Link href="/" className="footer-brand-link">
+            <span className="brand-icon">RK</span>
+            <span className="brand-text">Rushaid Khan</span>
           </Link>
           <p className="footer-tagline">
-            Full-stack developer &mdash; building things that matter.
+            Full-stack developer crafting modern, performant web experiences.
           </p>
         </div>
 
         <nav className="footer-nav" aria-label="Footer navigation">
           <p className="footer-nav-heading">Pages</p>
           <ul>
-            <li><Link href="/projects">Projects</Link></li>
-            <li><Link href="/blog">Blog</Link></li>
-            <li><Link href="/about">About</Link></li>
-            <li><Link href="/contact">Contact</Link></li>
+            <li>
+              <Link href="/projects">Projects</Link>
+            </li>
+            <li>
+              <Link href="/blog">Blog</Link>
+            </li>
+            <li>
+              <Link href="/about">About</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact</Link>
+            </li>
           </ul>
         </nav>
 
@@ -37,8 +46,9 @@ export default function Footer() {
               className="footer-social-link"
               aria-label="GitHub"
             >
-              <FaGithub size={18} />
+              <FaGithub size={16} />
               GitHub
+              <FiArrowUpRight size={12} />
             </a>
             <a
               href="https://linkedin.com/in/rushaid-khan"
@@ -47,16 +57,17 @@ export default function Footer() {
               className="footer-social-link"
               aria-label="LinkedIn"
             >
-              <FaLinkedin size={18} />
+              <FaLinkedin size={16} />
               LinkedIn
+              <FiArrowUpRight size={12} />
             </a>
             <a
               href="mailto:rushaidkhan53@gmail.com"
               className="footer-social-link"
               aria-label="Email"
             >
-              <FiMail size={18} />
-              Email
+              <FiMail size={16} />
+              rushaidkhan53@gmail.com
             </a>
           </div>
         </div>

@@ -32,7 +32,7 @@ export default function ProjectsPage() {
   }, [projects, filter]);
 
   return (
-    <section className="fade-in">
+    <section className="container fade-in">
       <header style={{ paddingBlock: "8px 0" }}>
         <h1 className="page-title">Projects</h1>
         <p className="page-intro">

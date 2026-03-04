@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar"; // ✅ client nav
-import Footer from "@/components/Footer"; // optional
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -12,11 +17,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Rushaid Khan — Full-Stack Developer",
+    default: "Rushaid Khan — Full-Stack Developer & Digital Strategist",
     template: "%s | Rushaid Khan",
   },
   description:
-    "Full-stack developer building modern web applications with React, Next.js, Node.js, and Firebase.",
+    "I build digital experiences that convert. Full-stack developer specializing in high-performance web applications, modern UI/UX, and scalable architectures.",
+  keywords: [
+    "full-stack developer",
+    "web developer",
+    "React",
+    "Next.js",
+    "portfolio",
+    "freelance developer",
+  ],
 };
 
 export default function RootLayout({
@@ -24,11 +37,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${inter.variable} ${playfair.variable} ${geistMono.variable}`}
+      >
         <Navbar />
-        <main className="container" style={{ paddingBlock: "32px" }}>
-          {children}
-        </main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>
